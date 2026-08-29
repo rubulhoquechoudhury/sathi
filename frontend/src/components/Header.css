@@ -1,0 +1,132 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+}
+
+.header__inner {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header__logo img {
+  height: 32px;
+  width: auto;
+}
+
+.header__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header__nav-link {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted);
+  border-radius: var(--radius-sm);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.header__nav-link:hover,
+.header__nav-link.active {
+  color: var(--color-navy);
+  background-color: var(--color-bg-light);
+}
+
+.header__profile-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  transition: color 0.2s, background-color 0.2s;
+  margin-left: 8px;
+}
+
+.header__profile-btn:hover {
+  color: var(--color-navy);
+  background-color: var(--color-bg-light);
+}
+
+.header__profile-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Mobile hamburger */
+.header__hamburger {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-navy);
+  border-radius: var(--radius-sm);
+}
+
+.header__hamburger svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Mobile nav overlay */
+.header__mobile-nav {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .header__nav {
+    display: none;
+  }
+
+  .header__hamburger {
+    display: flex;
+  }
+
+  .header__mobile-nav {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: 8px 16px;
+    box-shadow: var(--shadow-md);
+    z-index: 999;
+  }
+
+  .header__mobile-nav .header__nav-link {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+}

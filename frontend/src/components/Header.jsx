@@ -1,0 +1,108 @@
+import { useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import ProfileModal from './ProfileModal';
+import './Header.css';
+
+export default function Header({ isLoggedIn, onLogout }) {
+  const [showProfile, setShowProfile] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  return (
+    <>
+      <header className="header">
+        <div className="header__inner">
+          <Link to="/" className="header__logo">
+            <img src="/sathi-word-logo.png" alt="Sathi" />
+          </Link>
+
+          <div className="header__right">
+            {/* Desktop nav */}
+            <nav className="header__nav">
+              <NavLink
+                to="/about"
+                className={({ isActive }) =>
+                  `header__nav-link${isActive ? ' active' : ''}`
+                }
+              >
+                About
+              </NavLink>
+              <NavLink
+                to="/contact"
+                className={({ isActive }) =>
+                  `header__nav-link${isActive ? ' active' : ''}`
+                }
+              >
+                Contact
+              </NavLink>
+            </nav>
+
+            {/* Profile button */}
+            <button
+              className="header__profile-btn"
+              onClick={() => setShowProfile(true)}
+              aria-label="User profile"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </button>
+
+            {/* Mobile hamburger */}
+            <button
+              className="header__hamburger"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="Toggle navigation"
+            >
+              {mobileOpen ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile nav dropdown */}
+      {mobileOpen && (
+        <nav className="header__mobile-nav">
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `header__nav-link${isActive ? ' active' : ''}`
+            }
+            onClick={() => setMobileOpen(false)}
+          >
+            About
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className={({ isActive }) =>
+              `header__nav-link${isActive ? ' active' : ''}`
+            }
+            onClick={() => setMobileOpen(false)}
+          >
+            Contact
+          </NavLink>
+        </nav>
+      )}
+
+      {/* Profile modal */}
+      {showProfile && (
+        <ProfileModal
+          isLoggedIn={isLoggedIn}
+          onClose={() => setShowProfile(false)}
+          onLogout={onLogout}
+        />
+      )}
+    </>
+  );
+}
