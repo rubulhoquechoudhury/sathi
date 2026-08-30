@@ -21,15 +21,15 @@ const STYLES = {
   },
 };
 
-export default function MapView() {
+export default function MapView({version = "default" , height}) {
   return (
-    <div className="map-wrapper">
+    <div className={`map-wrapper ${version}`}>
       <MapContainer
         center={MAP_CENTER}
         zoom={MAP_ZOOM}
         scrollWheelZoom={true}
         zoomControl={true}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height:'100%', width: '100%' }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

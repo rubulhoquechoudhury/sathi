@@ -12,12 +12,31 @@ export default function Header({ isLoggedIn, onLogout }) {
       <header className="header">
         <div className="header__inner">
           <Link to="/" className="header__logo">
+            <img src="sathi-logo.png" alt="logo" />
             <img src="/sathi-word-logo.png" alt="Sathi" />
           </Link>
 
           <div className="header__right">
             {/* Desktop nav */}
             <nav className="header__nav">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `header__nav-link${isActive ? ' active' : ''}`
+                }
+              >
+                home
+              </NavLink>
+
+               <NavLink
+                to="/liveMap"
+                className={({ isActive }) =>
+                  `header__nav-link${isActive ? ' active' : ''}`
+                }
+              >
+                live map
+              </NavLink>
+
               <NavLink
                 to="/about"
                 className={({ isActive }) =>
@@ -34,6 +53,8 @@ export default function Header({ isLoggedIn, onLogout }) {
               >
                 Contact
               </NavLink>
+
+               
             </nav>
 
             {/* Profile button */}
@@ -74,6 +95,24 @@ export default function Header({ isLoggedIn, onLogout }) {
       {/* Mobile nav dropdown */}
       {mobileOpen && (
         <nav className="header__mobile-nav">
+           <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `header__nav-link${isActive ? ' active' : ''}`
+            }
+            onClick={() => setMobileOpen(false)}
+          >
+            home
+          </NavLink>
+           <NavLink
+            to="/liveMap"
+            className={({ isActive }) =>
+              `header__nav-link${isActive ? ' active' : ''}`
+            }
+            onClick={() => setMobileOpen(false)}
+          >
+            live map
+          </NavLink>
           <NavLink
             to="/about"
             className={({ isActive }) =>
