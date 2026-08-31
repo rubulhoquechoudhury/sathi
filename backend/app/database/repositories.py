@@ -264,3 +264,29 @@ class DashboardRepository:
     def get_active_recommendations(self) -> List[ActionRecommendation]:
         return self.db.query(ActionRecommendation).filter(ActionRecommendation.is_active == True).order_by(ActionRecommendation.priority.asc()).all()
 
+    def create_alert(self, alert_type: str, title: str, description: str, severity: str, time_ago: str = "Just now") -> SystemAlert:
+        alert = SystemAlert(
+            alert_type=alert_type,
+            title=title,
+            description=description,
+            severity=severity,
+            time_ago=time_ago,
+            is_active=True
+        )
+        self.db.add(alert)
+        self.db.commit()
+        self.db.refresh(alert)
+        return alert
+
+    def create_recommendation(self, recommendation_text: str, priority: int = 1) -> ActionRecommendation:
+        rec = ActionRecommendation(
+            recommendation_text=recommendation_text,
+            priority=priority,
+            is_active=True
+        )
+        self.db.add(rec)
+        self.db.commit()
+        self.db.refresh(rec)
+        return rec
+
+

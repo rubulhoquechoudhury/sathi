@@ -112,13 +112,23 @@
   flex-shrink: 0;
 }
 
-.map-legend__dot--flood {
-  background: #EAB308;
-}
-
-.map-legend__dot--landslide {
+.map-legend__dot--critical {
   background: #EF4444;
 }
+
+.map-legend__dot--high {
+  background: #F97316;
+}
+
+.map-legend__dot--flood-plain {
+  background: #3B82F6;
+}
+
+
+.map-legend__dot--low {
+  background: #22C55E;
+}
+
 
 
 @media (max-width: 640px) {

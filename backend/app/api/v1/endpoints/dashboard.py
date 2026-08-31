@@ -12,7 +12,7 @@ from app.database.connection import get_db
 from app.database.repositories import DashboardRepository
 from app.schemas.dashboard import (
     DashboardOverviewResponse, StatCardItem, ZoneSummaryItem,
-    AlertItem, TrendDataItem
+    AlertItem, TrendDataItem, AlertCreate
 )
 from app.services.ai_predictor import ai_predictor_service
 
@@ -39,13 +39,13 @@ def get_dashboard_overview(db: Session = Depends(get_db)):
         )
         for s in raw_stats
     ] if raw_stats else [
-        StatCardItem(label="Flood alerts", value="12", delta="+3 since yesterday", tone="flood"),
-        StatCardItem(label="Landslide watch", value="08", delta="+2 high-priority zones", tone="landslide"),
-        StatCardItem(label="People at risk", value="2.4K", delta="Across 6 districts", tone="risk"),
-        StatCardItem(label="Rainfall forecast", value="62 mm", delta="24h cumulative", tone="rain")
+        StatCardItem(label="Flood alerts", value="14", delta="+4 since yesterday", tone="flood"),
+        StatCardItem(label="Landslide watch", value="11,026", delta="SIH26001 dataset incidents", tone="landslide"),
+        StatCardItem(label="People at risk", value="5.8K", delta="Across 8 NE districts", tone="risk"),
+        StatCardItem(label="Rainfall forecast", value="84 mm", delta="24h cumulative forecast", tone="rain")
     ]
 
-    # 2. Zone Summaries (Districts)
+    # 2. Zone Summaries (Districts from SIH26001 dataset)
     raw_zones = repo.get_district_summaries()
     zone_summary = [
         ZoneSummaryItem(
@@ -56,14 +56,17 @@ def get_dashboard_overview(db: Session = Depends(get_db)):
         )
         for z in raw_zones
     ] if raw_zones else [
-        ZoneSummaryItem(district="Kamrup", flood=78, landslide=42, status="Moderate"),
-        ZoneSummaryItem(district="Goalpara", flood=88, landslide=55, status="High"),
-        ZoneSummaryItem(district="Dima Hasao", flood=46, landslide=83, status="Critical"),
-        ZoneSummaryItem(district="Karbi Anglong", flood=62, landslide=71, status="High"),
-        ZoneSummaryItem(district="West Khasi Hills", flood=39, landslide=90, status="Critical")
+        ZoneSummaryItem(district="Aizawl (1,317 Dataset Incidents)", flood=35, landslide=94, status="Critical"),
+        ZoneSummaryItem(district="Lunglei (669 Dataset Incidents)", flood=28, landslide=89, status="Critical"),
+        ZoneSummaryItem(district="East Khasi Hills (405 Dataset Incidents)", flood=42, landslide=92, status="Critical"),
+        ZoneSummaryItem(district="Dima Hasao (387 Dataset Incidents)", flood=62, landslide=87, status="Critical"),
+        ZoneSummaryItem(district="Kohima (487 Dataset Incidents)", flood=30, landslide=84, status="High"),
+        ZoneSummaryItem(district="Ukhrul (315 Dataset Incidents)", flood=24, landslide=78, status="High"),
+        ZoneSummaryItem(district="Kamrup / Guwahati Basin", flood=85, landslide=48, status="High"),
+        ZoneSummaryItem(district="Goalpara", flood=90, landslide=52, status="High")
     ]
 
-    # 3. Active Alerts
+    # 3. Active Alerts (Mapped from SIH26001 dataset hazards)
     raw_alerts = repo.get_active_alerts(limit=10)
     alerts = [
         AlertItem(
@@ -75,10 +78,13 @@ def get_dashboard_overview(db: Session = Depends(get_db)):
         )
         for a in raw_alerts
     ] if raw_alerts else [
-        AlertItem(type="Flood", title="Brahmaputra basin surge", time="10 mins ago", severity="High", description="River level above seasonal average near Kamrup and Goalpara."),
-        AlertItem(type="Landslide", title="Slope instability alert", time="28 mins ago", severity="Critical", description="Heavy rain and loose soil detected in Dima Hasao foothills."),
-        AlertItem(type="Rainfall", title="Monsoon intensity watch", time="1 hr ago", severity="Moderate", description="Persistent rainfall is increasing runoff in the eastern hill belts.")
+        AlertItem(type="Landslide", title="Aizawl Slopes Failure Watch (1,317 Historical Slides Logged)", time="8 mins ago", severity="Critical", description="Extreme soil saturation on steep hill cuts along Aizawl-Lunglei highway corridor."),
+        AlertItem(type="Landslide", title="Shillong & Cherrapunji Slope Instability Alert (405 Historical Slides Logged)", time="22 mins ago", severity="Critical", description="Torrential rainfall causing active soil creep and rockfalls across East Khasi Hills."),
+        AlertItem(type="Flood", title="Brahmaputra Basin Surge near Kamrup & Goalpara", time="45 mins ago", severity="High", description="Water level exceeding warning marks along lower river basin; lowlands flooded."),
+        AlertItem(type="Landslide", title="Kohima NH-29 Debris Slide Watch (487 Historical Slides Logged)", time="1 hr ago", severity="High", description="Road excavation and monsoon runoff causing slope mass movement near Kohima town."),
+        AlertItem(type="Landslide", title="Dima Hasao Hill Sector Cut Failure (387 Historical Slides Logged)", time="2 hrs ago", severity="High", description="Railway embankment and hill slope displacement reported in Dima Hasao district.")
     ]
+
 
     # 4. Trend Data
     raw_trends = repo.get_risk_trends()
@@ -116,3 +122,24 @@ def get_dashboard_overview(db: Session = Depends(get_db)):
         trend_data=trend_data,
         recommendations=recommendations
     )
+
+
+@router.post("/alerts", response_model=AlertItem)
+def create_system_alert(alert_data: AlertCreate, db: Session = Depends(get_db)):
+    """Create and persist a new system alert in SQL database."""
+    repo = DashboardRepository(db)
+    new_alert = repo.create_alert(
+        alert_type=alert_data.type,
+        title=alert_data.title,
+        description=alert_data.description,
+        severity=alert_data.severity,
+        time_ago=alert_data.time_ago or "Just now"
+    )
+    return AlertItem(
+        type=new_alert.alert_type,
+        title=new_alert.title,
+        time=new_alert.time_ago,
+        severity=new_alert.severity,
+        description=new_alert.description
+    )
+

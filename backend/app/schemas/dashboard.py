@@ -39,3 +39,12 @@ class DashboardOverviewResponse(BaseModel):
     alerts: List[AlertItem]
     trend_data: List[TrendDataItem]
     recommendations: List[str]
+
+
+class AlertCreate(BaseModel):
+    type: str = Field(..., description="Alert type (Flood, Landslide, Rainfall)")
+    title: str = Field(..., description="Alert title")
+    severity: str = Field(..., description="Severity level (Low, Moderate, High, Critical)")
+    description: str = Field(..., description="Detailed description")
+    time_ago: Optional[str] = Field(default="Just now")
+

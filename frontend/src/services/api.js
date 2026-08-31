@@ -60,8 +60,10 @@ export const apiService = {
 
   // 6. Predict & Dashboard Overview
   predict: (data) => fetchAPI('/api/v1/predictions/predict', { method: 'POST', body: JSON.stringify(data) }),
-  getDashboardOverview: () => fetchAPI('/api/v1/dashboard/overview')
+  getDashboardOverview: () => fetchAPI('/api/v1/dashboard/overview'),
+  createAlert: (data) => fetchAPI('/api/v1/dashboard/alerts', { method: 'POST', body: JSON.stringify(data) })
 };
+
 
 
 

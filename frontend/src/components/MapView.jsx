@@ -6,20 +6,52 @@ import { apiService } from '../services/api';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 
-const STYLES = {
-  flood: {
-    fillColor: '#EAB308',
-    fillOpacity: 0.35,
-    color: '#CA8A04',
-    weight: 2,
-    opacity: 0.8,
-  },
-  landslide: {
+// 4-Tier Risk Category Styles & Alert Badges
+const CATEGORY_STYLES = {
+  CRITICAL: {
     fillColor: '#EF4444',
-    fillOpacity: 0.35,
+    fillOpacity: 0.40,
     color: '#DC2626',
     weight: 2,
-    opacity: 0.8,
+    opacity: 0.90,
+    label: 'Critical Risk',
+    badgeBg: '#FEE2E2',
+    badgeColor: '#991B1B',
+    alertText: '🚨 ALERT: CRITICAL DANGER'
+  },
+  HIGH: {
+    fillColor: '#F97316',
+    fillOpacity: 0.40,
+    color: '#EA580C',
+    weight: 2,
+    opacity: 0.90,
+    label: 'High Risk',
+    badgeBg: '#FFEDD5',
+    badgeColor: '#C2410C',
+    alertText: '⚠️ ALERT: HIGH WARNING'
+  },
+  FLOOD_PLAIN: {
+    fillColor: '#3B82F6',
+    fillOpacity: 0.40,
+    color: '#1D4ED8',
+    weight: 2,
+    opacity: 0.90,
+    label: 'Flood Plain Risk',
+    badgeBg: '#DBEAFE',
+    badgeColor: '#1E40AF',
+    alertText: '⚠️ ALERT: FLOOD WATCH'
+  },
+
+  LOW: {
+    fillColor: '#22C55E',
+    fillOpacity: 0.40,
+    color: '#16A34A',
+    weight: 2,
+    opacity: 0.90,
+    label: 'Low Risk',
+    badgeBg: '#DCFCE7',
+    badgeColor: '#166534',
+    alertText: '🛡️ ALERT: NORMAL MONITORING'
   },
 };
 
@@ -33,7 +65,6 @@ export default function MapView({ version = "default", height }) {
         const data = await apiService.getZones();
         if (Array.isArray(data) && data.length > 0) {
           setZones(data);
-          // Set first zone as initial default selected if available
           if (!selectedZone) setSelectedZone(data[0]);
         }
       } catch (err) {
@@ -43,6 +74,27 @@ export default function MapView({ version = "default", height }) {
     }
     fetchLiveZones();
   }, []);
+
+  const getRiskCategory = (zone) => {
+    if (!zone) return 'LOW';
+    const cat = (zone.risk_category || zone.risk_level || '').toUpperCase().replace(/\s+/g, '_');
+
+    if (cat.includes('CRITICAL')) return 'CRITICAL';
+    if (cat.includes('HIGH')) return 'HIGH';
+    if (cat.includes('FLOOD') || cat.includes('PLAIN') || zone.type === 'flood') return 'FLOOD_PLAIN';
+    if (cat.includes('LOW')) return 'LOW';
+
+    const prob = zone.landslide_probability || 0.0;
+    if (prob >= 0.80) return 'CRITICAL';
+    if (prob >= 0.50) return 'HIGH';
+    if (prob >= 0.25) return 'FLOOD_PLAIN';
+    return 'LOW';
+  };
+
+  const getProneLabel = (zone) => {
+    if (!zone) return 'Landslide Prone Area';
+    return zone.type === 'flood' ? '🌊 Flood Prone Area' : '⛰️ Landslide Prone Area';
+  };
 
   const formatSoilMoisture = (val) => {
     if (val === null || val === undefined) return '42%';
@@ -62,6 +114,8 @@ export default function MapView({ version = "default", height }) {
     };
   };
 
+  const selectedCategory = getRiskCategory(selectedZone);
+  const selectedStyle = CATEGORY_STYLES[selectedCategory] || CATEGORY_STYLES.LOW;
   const activeTelemetry = getTelemetry(selectedZone);
 
   return (
@@ -79,6 +133,9 @@ export default function MapView({ version = "default", height }) {
         />
 
         {zones.map((zone) => {
+          const catKey = getRiskCategory(zone);
+          const styleConfig = CATEGORY_STYLES[catKey] || CATEGORY_STYLES.LOW;
+          const proneLabel = getProneLabel(zone);
           const tel = getTelemetry(zone);
           const isSelected = selectedZone?.id === zone.id;
 
@@ -87,30 +144,48 @@ export default function MapView({ version = "default", height }) {
               key={zone.id}
               positions={zone.coordinates}
               pathOptions={{
-                ...(STYLES[zone.type] || STYLES.landslide),
+                ...styleConfig,
                 weight: isSelected ? 4 : 2,
-                fillOpacity: isSelected ? 0.55 : 0.35
+                fillOpacity: isSelected ? 0.65 : 0.40
               }}
               eventHandlers={{
                 click: () => setSelectedZone(zone)
               }}
             >
               <Tooltip direction="top" sticky>
-                <div style={{ fontSize: '12px', lineHeight: '1.4' }}>
-                  <strong style={{ fontSize: '13px', color: '#0F172A' }}>{zone.name}</strong>
-                  <br />
-                  <span style={{
+                <div style={{ fontSize: '12px', lineHeight: '1.4', padding: '2px' }}>
+                  <strong style={{ fontSize: '13px', color: '#0F172A', display: 'block', marginBottom: '2px' }}>
+                    {zone.name}
+                  </strong>
+
+                  {/* Prone Designation */}
+                  <div style={{
                     fontWeight: '700',
-                    color: zone.type === 'flood' ? '#CA8A04' : '#DC2626'
+                    fontSize: '12px',
+                    color: zone.type === 'flood' ? '#2563EB' : '#DC2626',
+
+                    marginBottom: '4px'
                   }}>
-                    {zone.type === 'flood' ? 'Flood Risk Zone' : 'Landslide Risk Zone'}
-                  </span>
-                  {zone.risk_level && (
-                    <span style={{ marginLeft: '6px', fontSize: '11px', background: '#F1F5F9', padding: '1px 5px', borderRadius: '4px' }}>
-                      {zone.risk_level}
-                    </span>
-                  )}
+                    {proneLabel}
+                  </div>
+
+                  {/* Alert Status Badge */}
+                  <div style={{
+                    display: 'inline-block',
+                    background: styleConfig.badgeBg,
+                    color: styleConfig.badgeColor,
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    fontWeight: '800',
+                    marginBottom: '6px'
+                  }}>
+                    {styleConfig.alertText}
+                  </div>
+
                   <hr style={{ margin: '4px 0', border: 'none', borderTop: '1px solid #E2E8F0' }} />
+
+                  {/* Environmental Telemetry */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 8px', fontSize: '11px' }}>
                     <span>🌡️ Temp: <strong>{tel.temp}</strong></span>
                     <span>💧 Hum: <strong>{tel.humidity}</strong></span>
@@ -130,13 +205,21 @@ export default function MapView({ version = "default", height }) {
           <div className="zone-telemetry-panel__header">
             <div>
               <div className="zone-telemetry-panel__title">{selectedZone.name}</div>
+              <div style={{ fontSize: '12px', fontWeight: '700', color: selectedZone.type === 'flood' ? '#2563EB' : '#DC2626', marginTop: '2px' }}>
+
+                {getProneLabel(selectedZone)}
+              </div>
               <span style={{
                 fontSize: '11px',
-                fontWeight: '700',
-                color: selectedZone.type === 'flood' ? '#CA8A04' : '#DC2626'
+                fontWeight: '800',
+                color: selectedStyle.badgeColor,
+                background: selectedStyle.badgeBg,
+                padding: '2px 8px',
+                borderRadius: '4px',
+                display: 'inline-block',
+                marginTop: '4px'
               }}>
-                {selectedZone.type === 'flood' ? 'Flood Risk Zone' : 'Landslide Risk Zone'}
-                {selectedZone.risk_level ? ` • ${selectedZone.risk_level}` : ''}
+                {selectedStyle.alertText}
               </span>
             </div>
             <button

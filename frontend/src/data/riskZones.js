@@ -1,20 +1,66 @@
 /**
- * Sample disaster risk zone data.
- * Polygons are positioned around Assam / Northeast India for realism.
- * Each zone has: id, name, type ('flood' | 'landslide'), coordinates, and telemetry.
+ * Disaster risk zone data categorized by risk levels:
+ * CRITICAL (Red), HIGH (Orange), FLOOD PLAIN (Yellow), and LOW (Green).
  */
 
 export const MAP_CENTER = [26.15, 91.75];
 export const MAP_ZOOM = 10;
 
 export const riskZones = [
-  // — Flood Risk Zones —
+  // 1. Critical Risk Zone (Red)
   {
-    id: 'flood-1',
+    id: 'zone-critical-1',
+    name: 'Meghalaya Foothills Slope',
+    type: 'landslide',
+    risk_level: 'CRITICAL',
+    risk_category: 'CRITICAL',
+    landslide_probability: 0.94,
+    coordinates: [
+      [25.98, 91.82],
+      [26.02, 91.90],
+      [25.99, 91.96],
+      [25.93, 91.92],
+      [25.94, 91.84],
+    ],
+    telemetry: {
+      temperature: 24.2,
+      humidity: 94,
+      soil_moisture: 0.68,
+      rainfall_mm: 58.0
+    }
+  },
+
+  // 2. High Risk Zone (Orange)
+  {
+    id: 'zone-high-1',
+    name: 'Ri-Bhoi Hill Slopes',
+    type: 'landslide',
+    risk_level: 'HIGH',
+    risk_category: 'HIGH',
+    landslide_probability: 0.76,
+    coordinates: [
+      [25.90, 91.65],
+      [25.95, 91.72],
+      [25.93, 91.80],
+      [25.87, 91.78],
+      [25.86, 91.69],
+    ],
+    telemetry: {
+      temperature: 25.1,
+      humidity: 88,
+      soil_moisture: 0.58,
+      rainfall_mm: 41.2
+    }
+  },
+
+  // 3. Flood Plain Risk Zone (Yellow)
+  {
+    id: 'zone-floodplain-1',
     name: 'Brahmaputra Floodplain – West',
     type: 'flood',
-    risk_level: 'HIGH',
-    landslide_probability: 0.68,
+    risk_level: 'FLOOD PLAIN',
+    risk_category: 'FLOOD_PLAIN',
+    landslide_probability: 0.45,
     coordinates: [
       [26.22, 91.55],
       [26.28, 91.62],
@@ -30,11 +76,12 @@ export const riskZones = [
     }
   },
   {
-    id: 'flood-2',
+    id: 'zone-floodplain-2',
     name: 'Brahmaputra Floodplain – East',
     type: 'flood',
-    risk_level: 'MODERATE',
-    landslide_probability: 0.45,
+    risk_level: 'FLOOD PLAIN',
+    risk_category: 'FLOOD_PLAIN',
+    landslide_probability: 0.38,
     coordinates: [
       [26.12, 91.78],
       [26.18, 91.85],
@@ -49,12 +96,15 @@ export const riskZones = [
       rainfall_mm: 18.0
     }
   },
+
+  // 4. Low Risk Zone (Green)
   {
-    id: 'flood-3',
-    name: 'Kolong River Basin',
+    id: 'zone-low-1',
+    name: 'Kolong River Basin Lowland',
     type: 'flood',
     risk_level: 'LOW',
-    landslide_probability: 0.18,
+    risk_category: 'LOW',
+    landslide_probability: 0.14,
     coordinates: [
       [26.05, 91.60],
       [26.10, 91.68],
@@ -67,48 +117,6 @@ export const riskZones = [
       humidity: 74,
       soil_moisture: 0.32,
       rainfall_mm: 5.2
-    }
-  },
-
-  // — Landslide Risk Zones —
-  {
-    id: 'landslide-1',
-    name: 'Meghalaya Foothills – North',
-    type: 'landslide',
-    risk_level: 'CRITICAL',
-    landslide_probability: 0.92,
-    coordinates: [
-      [25.98, 91.82],
-      [26.02, 91.90],
-      [25.99, 91.96],
-      [25.93, 91.92],
-      [25.94, 91.84],
-    ],
-    telemetry: {
-      temperature: 24.5,
-      humidity: 92,
-      soil_moisture: 0.65,
-      rainfall_mm: 54.0
-    }
-  },
-  {
-    id: 'landslide-2',
-    name: 'Ri-Bhoi Hill Slopes',
-    type: 'landslide',
-    risk_level: 'HIGH',
-    landslide_probability: 0.76,
-    coordinates: [
-      [25.90, 91.65],
-      [25.95, 91.72],
-      [25.93, 91.80],
-      [25.87, 91.78],
-      [25.86, 91.69],
-    ],
-    telemetry: {
-      temperature: 25.0,
-      humidity: 88,
-      soil_moisture: 0.58,
-      rainfall_mm: 41.2
     }
   },
 ];
