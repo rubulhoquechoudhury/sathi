@@ -1,74 +1,280 @@
 /**
- * Sample disaster risk zone data.
- * Polygons are positioned around Assam / Northeast India for realism.
- * Each zone has: id, name, type ('flood' | 'landslide'), and coordinates.
+ * Comprehensive Spatial Risk Zone Corpus covering ALL 8 North-Eastern States of India:
+ * Assam, Meghalaya, Arunachal Pradesh, Sikkim, Manipur, Mizoram, Nagaland, and Tripura.
+ * Covers Plains, River Basins, Valleys, Highway Corridors, Urban Lowlands, and Mountain Ridges.
  */
 
-export const MAP_CENTER = [26.15, 91.75];
-export const MAP_ZOOM = 10;
+export const MAP_CENTER = [26.0, 93.0];
+export const MAP_ZOOM = 7;
 
 export const riskZones = [
-  // — Flood Risk Zones —
+  // 1. ASSAM — Guwahati Ridge (Hill Slope -> CRITICAL RED RISK)
   {
-    id: 'flood-1',
-    name: 'Brahmaputra Floodplain – West',
-    type: 'flood',
+    id: 'zone-assam-guwahati',
+    name: 'Guwahati Ridge & South Slope (Assam)',
+    type: 'landslide',
+    risk_level: 'CRITICAL',
     coordinates: [
-      [26.22, 91.55],
-      [26.28, 91.62],
-      [26.25, 91.72],
-      [26.18, 91.70],
-      [26.15, 91.60],
+      [26.14, 91.70], [26.18, 91.75], [26.15, 91.82], [26.10, 91.78], [26.11, 91.71]
     ],
-  },
-  {
-    id: 'flood-2',
-    name: 'Brahmaputra Floodplain – East',
-    type: 'flood',
-    coordinates: [
-      [26.12, 91.78],
-      [26.18, 91.85],
-      [26.20, 91.95],
-      [26.14, 91.98],
-      [26.08, 91.88],
-    ],
-  },
-  {
-    id: 'flood-3',
-    name: 'Kolong River Basin',
-    type: 'flood',
-    coordinates: [
-      [26.05, 91.60],
-      [26.10, 91.68],
-      [26.08, 91.76],
-      [26.02, 91.73],
-      [26.00, 91.64],
-    ],
+    sample_location: { latitude: 26.15, longitude: 91.75 },
+    sample_terrain: { elevation: 2100.0, slope: 48.5, twi: 9.2 },
+    sample_rainfall: { rain_1h: 25.0, rain_24h: 125.0, rain_3d: 210.0, rain_7d: 380.0, rain_14d: 520.0 },
+    sample_soil: { moisture_0_7cm: 0.55 }
   },
 
-  // — Landslide Risk Zones —
+  // 2. ASSAM — Dibrugarh Plains (Lowland Plain -> LOW GREEN RISK)
   {
-    id: 'landslide-1',
-    name: 'Meghalaya Foothills – North',
-    type: 'landslide',
+    id: 'zone-assam-dibrugarh',
+    name: 'Dibrugarh Plains & Upper Assam Basin (Assam)',
+    type: 'flood',
+    risk_level: 'LOW',
     coordinates: [
-      [25.98, 91.82],
-      [26.02, 91.90],
-      [25.99, 91.96],
-      [25.93, 91.92],
-      [25.94, 91.84],
+      [27.42, 94.85], [27.52, 94.95], [27.48, 95.10], [27.35, 95.02], [27.36, 94.88]
     ],
+    sample_location: { latitude: 27.45, longitude: 94.92 },
+    sample_terrain: { elevation: 85.0, slope: 2.5, twi: 4.0 },
+    sample_rainfall: { rain_1h: 0.0, rain_24h: 1.5, rain_3d: 4.0, rain_7d: 8.0, rain_14d: 12.0 },
+    sample_soil: { moisture_0_7cm: 0.28 }
   },
+
+  // 3. ASSAM — Silchar Valley (Barak River Plain -> LOW GREEN RISK)
   {
-    id: 'landslide-2',
-    name: 'Ri-Bhoi Hill Slopes',
-    type: 'landslide',
+    id: 'zone-assam-silchar',
+    name: 'Silchar Valley & Barak River Plains (Assam)',
+    type: 'flood',
+    risk_level: 'LOW',
     coordinates: [
-      [25.90, 91.65],
-      [25.95, 91.72],
-      [25.93, 91.80],
-      [25.87, 91.78],
-      [25.86, 91.69],
+      [24.78, 92.75], [24.88, 92.85], [24.82, 92.95], [24.70, 92.90], [24.71, 92.78]
     ],
+    sample_location: { latitude: 24.80, longitude: 92.80 },
+    sample_terrain: { elevation: 85.0, slope: 2.8, twi: 4.2 },
+    sample_rainfall: { rain_1h: 0.0, rain_24h: 1.8, rain_3d: 4.5, rain_7d: 9.0, rain_14d: 14.0 },
+    sample_soil: { moisture_0_7cm: 0.29 }
   },
+
+  // 4. ASSAM — Tezpur River Basin & Flood Plain (MODERATE YELLOW RISK)
+  {
+    id: 'zone-assam-tezpur',
+    name: 'Tezpur Flood Plain & North Bank (Assam)',
+    type: 'flood',
+    risk_level: 'MODERATE',
+    coordinates: [
+      [26.60, 92.75], [26.70, 92.88], [26.65, 93.00], [26.52, 92.92], [26.54, 92.78]
+    ],
+    sample_location: { latitude: 26.62, longitude: 92.80 },
+    sample_terrain: { elevation: 450.0, slope: 14.0, twi: 5.8 },
+    sample_rainfall: { rain_1h: 0.4, rain_24h: 8.0, rain_3d: 18.0, rain_7d: 35.0, rain_14d: 50.0 },
+    sample_soil: { moisture_0_7cm: 0.36 }
+  },
+
+  // 5. ASSAM — Brahmaputra Central Channel
+  {
+    id: 'zone-assam-brahmaputra',
+    name: 'Brahmaputra Flood Plain & River Islands (Assam)',
+    type: 'flood',
+    risk_level: 'HIGH',
+    coordinates: [
+      [26.22, 91.55], [26.35, 92.50], [26.42, 93.80], [26.25, 93.75], [26.15, 91.60]
+    ],
+    sample_location: { latitude: 26.22, longitude: 91.55 },
+    sample_terrain: { elevation: 55.0, slope: 2.1, twi: 11.2 },
+    sample_rainfall: { rain_1h: 5.0, rain_24h: 40.0, rain_3d: 80.0, rain_7d: 150.0, rain_14d: 220.0 },
+    sample_soil: { moisture_0_7cm: 0.48 }
+  },
+
+  // 6. MEGHALAYA — Shillong Plateau & Cherrapunji (CRITICAL RED RISK)
+  {
+    id: 'zone-meghalaya-shillong',
+    name: 'Shillong Ridge & Cherrapunji Foothills (Meghalaya)',
+    type: 'landslide',
+    risk_level: 'CRITICAL',
+    coordinates: [
+      [25.50, 91.80], [25.60, 91.90], [25.55, 92.05], [25.42, 91.98], [25.43, 91.82]
+    ],
+    sample_location: { latitude: 25.55, longitude: 91.90 },
+    sample_terrain: { elevation: 1950.0, slope: 48.2, twi: 9.8 },
+    sample_rainfall: { rain_1h: 42.0, rain_24h: 180.0, rain_3d: 320.0, rain_7d: 550.0, rain_14d: 850.0 },
+    sample_soil: { moisture_0_7cm: 0.58 }
+  },
+
+  // 7. MEGHALAYA — Jowai Mining & Highway Corridor (HIGH ORANGE RISK)
+  {
+    id: 'zone-meghalaya-jowai',
+    name: 'Jowai Plateau & Highway Excavation Belt (Meghalaya)',
+    type: 'landslide',
+    risk_level: 'HIGH',
+    coordinates: [
+      [25.40, 92.15], [25.48, 92.25], [25.43, 92.35], [25.32, 92.28], [25.33, 92.18]
+    ],
+    sample_location: { latitude: 25.44, longitude: 92.20 },
+    sample_terrain: { elevation: 1380.0, slope: 36.2, twi: 8.1 },
+    sample_rainfall: { rain_1h: 28.0, rain_24h: 110.0, rain_3d: 210.0, rain_7d: 360.0, rain_14d: 510.0 },
+    sample_soil: { moisture_0_7cm: 0.45 }
+  },
+
+  // 8. ARUNACHAL PRADESH — Itanagar Hills (HIGH ORANGE RISK)
+  {
+    id: 'zone-arunachal-itanagar',
+    name: 'Itanagar Hills & Lower Subansiri Slopes (Arunachal Pradesh)',
+    type: 'landslide',
+    risk_level: 'HIGH',
+    coordinates: [
+      [27.05, 93.55], [27.15, 93.68], [27.10, 93.80], [26.98, 93.75], [26.99, 93.58]
+    ],
+    sample_location: { latitude: 27.08, longitude: 93.65 },
+    sample_terrain: { elevation: 1820.0, slope: 38.7, twi: 8.4 },
+    sample_rainfall: { rain_1h: 24.0, rain_24h: 98.0, rain_3d: 190.0, rain_7d: 320.0, rain_14d: 480.0 },
+    sample_soil: { moisture_0_7cm: 0.46 }
+  },
+
+  // 9. ARUNACHAL PRADESH — Pasighat Valley (LOW GREEN RISK)
+  {
+    id: 'zone-arunachal-pasighat',
+    name: 'Pasighat Valley & Siang River Plains (Arunachal Pradesh)',
+    type: 'flood',
+    risk_level: 'LOW',
+    coordinates: [
+      [28.02, 95.28], [28.12, 95.38], [28.08, 95.50], [27.95, 95.42], [27.96, 95.30]
+    ],
+    sample_location: { latitude: 28.06, longitude: 95.33 },
+    sample_terrain: { elevation: 155.0, slope: 3.0, twi: 4.1 },
+    sample_rainfall: { rain_1h: 0.0, rain_24h: 2.0, rain_3d: 5.0, rain_7d: 10.0, rain_14d: 16.0 },
+    sample_soil: { moisture_0_7cm: 0.28 }
+  },
+
+  // 10. SIKKIM — Gangtok Teesta Gorge (CRITICAL RED RISK)
+  {
+    id: 'zone-sikkim-gangtok',
+    name: 'Gangtok Ridge & Teesta River Gorge (Sikkim)',
+    type: 'landslide',
+    risk_level: 'CRITICAL',
+    coordinates: [
+      [27.30, 88.55], [27.40, 88.65], [27.35, 88.78], [27.22, 88.70], [27.24, 88.58]
+    ],
+    sample_location: { latitude: 27.33, longitude: 88.62 },
+    sample_terrain: { elevation: 2200.0, slope: 51.0, twi: 10.2 },
+    sample_rainfall: { rain_1h: 38.0, rain_24h: 145.0, rain_3d: 260.0, rain_7d: 440.0, rain_14d: 620.0 },
+    sample_soil: { moisture_0_7cm: 0.56 }
+  },
+
+  // 11. MANIPUR — Imphal Central Valley (LOW GREEN RISK)
+  {
+    id: 'zone-manipur-imphal',
+    name: 'Imphal Central Valley & Loktak Lake Plain (Manipur)',
+    type: 'flood',
+    risk_level: 'LOW',
+    coordinates: [
+      [24.72, 93.88], [24.82, 93.95], [24.78, 94.05], [24.65, 93.98], [24.66, 93.89]
+    ],
+    sample_location: { latitude: 24.75, longitude: 93.92 },
+    sample_terrain: { elevation: 780.0, slope: 3.1, twi: 4.2 },
+    sample_rainfall: { rain_1h: 0.0, rain_24h: 1.2, rain_3d: 3.5, rain_7d: 7.0, rain_14d: 12.0 },
+    sample_soil: { moisture_0_7cm: 0.27 }
+  },
+
+  // 12. MANIPUR — Ukhrul Ridge (MODERATE YELLOW RISK)
+  {
+    id: 'zone-manipur-ukhrul',
+    name: 'Ukhrul Slopes & Border Highway (Manipur)',
+    type: 'landslide',
+    risk_level: 'MODERATE',
+    coordinates: [
+      [25.05, 94.30], [25.15, 94.42], [25.10, 94.52], [24.98, 94.45], [24.99, 94.32]
+    ],
+    sample_location: { latitude: 25.11, longitude: 94.36 },
+    sample_terrain: { elevation: 450.0, slope: 14.2, twi: 5.8 },
+    sample_rainfall: { rain_1h: 0.4, rain_24h: 8.0, rain_3d: 18.0, rain_7d: 35.0, rain_14d: 50.0 },
+    sample_soil: { moisture_0_7cm: 0.36 }
+  },
+
+  // 13. MIZORAM — Aizawl Ridge (HIGH ORANGE RISK)
+  {
+    id: 'zone-mizoram-aizawl',
+    name: 'Aizawl Steep Ridge & Lunglei Highway Corridor (Mizoram)',
+    type: 'landslide',
+    risk_level: 'HIGH',
+    coordinates: [
+      [23.70, 92.68], [23.82, 92.75], [23.75, 92.85], [23.62, 92.80], [23.64, 92.70]
+    ],
+    sample_location: { latitude: 23.73, longitude: 92.72 },
+    sample_terrain: { elevation: 1650.0, slope: 36.5, twi: 8.1 },
+    sample_rainfall: { rain_1h: 22.0, rain_24h: 88.0, rain_3d: 175.0, rain_7d: 295.0, rain_14d: 430.0 },
+    sample_soil: { moisture_0_7cm: 0.44 }
+  },
+
+  // 14. NAGALAND — Dimapur Commercial Plain (LOW GREEN RISK)
+  {
+    id: 'zone-nagaland-dimapur',
+    name: 'Dimapur Valley Plains & Dhansiri Basin (Nagaland)',
+    type: 'flood',
+    risk_level: 'LOW',
+    coordinates: [
+      [25.85, 93.68], [25.95, 93.78], [25.90, 93.88], [25.78, 93.82], [25.79, 93.70]
+    ],
+    sample_location: { latitude: 25.88, longitude: 93.73 },
+    sample_terrain: { elevation: 195.0, slope: 3.0, twi: 4.1 },
+    sample_rainfall: { rain_1h: 0.0, rain_24h: 1.8, rain_3d: 4.2, rain_7d: 8.5, rain_14d: 14.0 },
+    sample_soil: { moisture_0_7cm: 0.28 }
+  },
+
+  // 15. NAGALAND — Kohima Ridge (HIGH ORANGE RISK)
+  {
+    id: 'zone-nagaland-kohima',
+    name: 'Kohima Town Slopes & Mokokchung Ridge (Nagaland)',
+    type: 'landslide',
+    risk_level: 'HIGH',
+    coordinates: [
+      [25.62, 94.05], [25.72, 94.18], [25.68, 94.28], [25.55, 94.22], [25.56, 94.08]
+    ],
+    sample_location: { latitude: 25.65, longitude: 94.10 },
+    sample_terrain: { elevation: 1780.0, slope: 37.8, twi: 8.2 },
+    sample_rainfall: { rain_1h: 21.0, rain_24h: 85.0, rain_3d: 168.0, rain_7d: 285.0, rain_14d: 410.0 },
+    sample_soil: { moisture_0_7cm: 0.45 }
+  },
+
+  // 16. TRIPURA — Agartala Urban Plain (LOW GREEN RISK)
+  {
+    id: 'zone-tripura-agartala',
+    name: 'Agartala Urban Plain & Haora River Lowland (Tripura)',
+    type: 'flood',
+    risk_level: 'LOW',
+    coordinates: [
+      [23.80, 91.22], [23.88, 91.32], [23.82, 91.40], [23.72, 91.35], [23.74, 91.25]
+    ],
+    sample_location: { latitude: 23.83, longitude: 91.28 },
+    sample_terrain: { elevation: 42.0, slope: 2.2, twi: 3.9 },
+    sample_rainfall: { rain_1h: 0.0, rain_24h: 1.0, rain_3d: 3.0, rain_7d: 6.0, rain_14d: 10.0 },
+    sample_soil: { moisture_0_7cm: 0.26 }
+  },
+
+  // 17. TRIPURA — Jampui Hills Slopes (MODERATE YELLOW RISK)
+  {
+    id: 'zone-tripura-jampui',
+    name: 'Jampui Ridge & Kanchanpur Foothills (Tripura)',
+    type: 'landslide',
+    risk_level: 'MODERATE',
+    coordinates: [
+      [23.90, 92.20], [24.00, 92.30], [23.95, 92.38], [23.82, 92.32], [23.84, 92.22]
+    ],
+    sample_location: { latitude: 23.92, longitude: 92.26 },
+    sample_terrain: { elevation: 450.0, slope: 14.5, twi: 5.8 },
+    sample_rainfall: { rain_1h: 0.4, rain_24h: 8.0, rain_3d: 18.0, rain_7d: 35.0, rain_14d: 50.0 },
+    sample_soil: { moisture_0_7cm: 0.36 }
+  },
+
+  // 18. HIGHWAY CORRIDOR — NH-27 Guwahati-Nagaon Expressway (MODERATE YELLOW RISK)
+  {
+    id: 'zone-highway-nh27',
+    name: 'NH-27 Guwahati-Nagaon Expressway Corridor',
+    type: 'flood',
+    risk_level: 'MODERATE',
+    coordinates: [
+      [26.18, 91.90], [26.28, 92.30], [26.22, 92.45], [26.12, 92.40], [26.10, 91.95]
+    ],
+    sample_location: { latitude: 26.20, longitude: 92.10 },
+    sample_terrain: { elevation: 450.0, slope: 14.0, twi: 5.8 },
+    sample_rainfall: { rain_1h: 0.4, rain_24h: 8.0, rain_3d: 18.0, rain_7d: 35.0, rain_14d: 50.0 },
+    sample_soil: { moisture_0_7cm: 0.36 }
+  }
 ];

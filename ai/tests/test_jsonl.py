@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 import pytest
 
-from preprocessing.load_jsonl import load_jsonl_dataset, save_jsonl_dataset
+from ai.preprocessing.load_jsonl import load_jsonl_dataset, save_jsonl_dataset
 
 
 def test_load_valid_jsonl():

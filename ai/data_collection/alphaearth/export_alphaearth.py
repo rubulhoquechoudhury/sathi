@@ -6,7 +6,7 @@ Handles GEE authentication, ROI querying, and vector extraction for AlphaEarth e
 import os
 import logging
 from typing import List, Dict, Any, Optional, Tuple
-from config.config import get_default_config
+from ai.config.config import get_default_config
 
 logger = logging.getLogger(__name__)
 

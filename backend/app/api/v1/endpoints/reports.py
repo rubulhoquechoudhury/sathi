@@ -1,53 +1,53 @@
-"""
-Citizen landslide report submission & retrieval endpoints.
-"""
-
-import uuid
+"""Citizen Reports API Endpoint."""
 from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-
-from app.database.session import get_db
-from app.database.models import CitizenReport
-from app.schemas.citizen import CitizenReportCreate, CitizenReportResponse
+from app.database.connection import get_db
+from app.database.repositories import CitizenReportRepository
+from app.schemas.report import CitizenReportCreate, CitizenReportResponse
 
 router = APIRouter()
 
 
-@router.post("/reports", response_model=CitizenReportResponse, status_code=status.HTTP_201_CREATED)
-def submit_citizen_report(
-    payload: CitizenReportCreate,
-    db: Session = Depends(get_db)
-) -> CitizenReportResponse:
-    """Submit a new citizen landslide observation report."""
-    report_id = f"rep_{uuid.uuid4().hex[:10]}"
-
-    report_db = CitizenReport(
-        report_id=report_id,
-        latitude=payload.latitude,
-        longitude=payload.longitude,
-        reporter_name=payload.reporter_name,
-        severity=payload.severity,
-        description=payload.description,
-        status="PENDING"
+@router.post("", response_model=CitizenReportResponse, status_code=status.HTTP_201_CREATED)
+def submit_citizen_report(report: CitizenReportCreate, db: Session = Depends(get_db)):
+    """
+    Submit citizen report.
+    Stored for monitoring & dashboard display, but strictly EXCLUDED from predictive AI model input.
+    """
+    repo = CitizenReportRepository(db)
+    rep = repo.create_report(
+        lat=report.latitude,
+        lon=report.longitude,
+        severity=report.severity,
+        description=report.description or "",
+        image_url=report.image_url
     )
-    db.add(report_db)
-    db.commit()
-    db.refresh(report_db)
-
-    return report_db
-
-
-@router.get("/reports", response_model=List[CitizenReportResponse])
-def list_citizen_reports(
-    limit: int = 50,
-    db: Session = Depends(get_db)
-) -> List[CitizenReportResponse]:
-    """Retrieve submitted citizen landslide reports."""
-    reports = (
-        db.query(CitizenReport)
-        .order_by(CitizenReport.created_at.desc())
-        .limit(limit)
-        .all()
+    return CitizenReportResponse(
+        id=rep.id,
+        latitude=rep.latitude,
+        longitude=rep.longitude,
+        severity=rep.severity,
+        description=rep.description,
+        image_url=rep.image_url,
+        created_at=rep.created_at.isoformat()
     )
-    return reports
+
+
+@router.get("", response_model=List[CitizenReportResponse])
+def get_citizen_reports(limit: int = 50, db: Session = Depends(get_db)):
+    """Fetch citizen reports."""
+    repo = CitizenReportRepository(db)
+    reports = repo.get_all(limit=limit)
+    return [
+        CitizenReportResponse(
+            id=r.id,
+            latitude=r.latitude,
+            longitude=r.longitude,
+            severity=r.severity,
+            description=r.description,
+            image_url=r.image_url,
+            created_at=r.created_at.isoformat()
+        )
+        for r in reports
+    ]

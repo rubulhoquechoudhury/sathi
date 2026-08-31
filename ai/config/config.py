@@ -1,5 +1,6 @@
 """
 Central configuration for SIH26001 Landslide Early-Warning AI Pipeline.
+Updated to enforce strict leakage prevention and One-Hot Encoding for categoricals.
 """
 
 import os
@@ -16,6 +17,7 @@ class Config:
     SAVED_MODELS_DIR: Path = AI_DIR / "saved_models"
     EXPERIMENTS_DIR: Path = AI_DIR / "experiments"
     RESULTS_DIR: Path = EXPERIMENTS_DIR / "results"
+    DIAGNOSTICS_DIR: Path = AI_DIR / "diagnostics"
 
     # Default file paths
     TRAIN_JSONL: Path = DATASET_DIR / "train.jsonl"
@@ -24,19 +26,25 @@ class Config:
 
     MODEL_SAVE_PATH: Path = SAVED_MODELS_DIR / "landslide_xgboost.json"
     SCHEMA_SAVE_PATH: Path = SAVED_MODELS_DIR / "feature_schema.json"
+    PREPROCESSING_SAVE_PATH: Path = SAVED_MODELS_DIR / "preprocessing.json"
+    METADATA_SAVE_PATH: Path = SAVED_MODELS_DIR / "model_metadata.json"
+
     METRICS_SAVE_PATH: Path = RESULTS_DIR / "metrics.json"
+    MODEL_COMPARISON_JSON: Path = RESULTS_DIR / "model_comparison.json"
+    MODEL_COMPARISON_MD: Path = RESULTS_DIR / "model_comparison.md"
     FEATURE_IMPORTANCE_PATH: Path = RESULTS_DIR / "feature_importance.csv"
     FEATURE_IMPORTANCE_PLOT: Path = RESULTS_DIR / "feature_importance.png"
 
     # AlphaEarth Foundations Configuration
     ALPHAEARTH_EMBEDDING_DIM: int = 64
     EARTHENGINE_PROJECT: str = os.getenv("EARTHENGINE_PROJECT", "sathi-507115")
-    # Official or placeholder Earth Engine AlphaEarth asset collection ID
-    # Note: Replace with the official EE asset path when provisioned in your GEE project.
     ALPHAEARTH_EE_ASSET_ID: str = os.getenv(
         "ALPHAEARTH_EE_ASSET_ID",
         "projects/google/alphaearth/foundations/v1"
     )
+
+    # Prediction horizon for early warning
+    PREDICTION_HORIZON_HOURS: int = 24
 
     # Risk level classification thresholds
     RISK_LEVEL_THRESHOLDS: Dict[str, float] = {
@@ -57,13 +65,7 @@ class Config:
         "eval_metric": "logloss"
     }
 
-    # Feature Encodings & Known Categoricals
-    CATEGORICAL_COLUMNS: List[str] = [
-        "geology_lithology",
-        "geology_geomorphology",
-        "land_use_class"
-    ]
-
+    # Known Categorical Column Values
     KNOWN_CATEGORICAL_VALUES: Dict[str, List[str]] = {
         "geology_lithology": [
             "unknown", "metamorphic_rock", "sedimentary_rock",
@@ -79,7 +81,7 @@ class Config:
         ]
     }
 
-    # Expected Numerical Features
+    # Predictive Early-Warning Numerical Features (Excluded post-event citizen reports to avoid leakage)
     NUMERICAL_FEATURES: List[str] = [
         "terrain_elevation",
         "terrain_slope",
@@ -105,9 +107,7 @@ class Config:
         "historical_previous_landslide",
         "historical_landslide_count_nearby",
         "iot_rainfall_mm",
-        "iot_soil_moisture",
-        "citizen_report_reported",
-        "citizen_report_severity"
+        "iot_soil_moisture"
     ]
 
     RANDOM_SEED: int = 42
