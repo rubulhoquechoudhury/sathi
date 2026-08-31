@@ -38,6 +38,15 @@ export default function Header({ isLoggedIn, onLogout }) {
               </NavLink>
 
               <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `header__nav-link${isActive ? ' active' : ''}`
+                }
+              >
+                Dashboard
+              </NavLink>
+
+              <NavLink
                 to="/about"
                 className={({ isActive }) =>
                   `header__nav-link${isActive ? ' active' : ''}`
@@ -112,6 +121,15 @@ export default function Header({ isLoggedIn, onLogout }) {
             onClick={() => setMobileOpen(false)}
           >
             live map
+          </NavLink>
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `header__nav-link${isActive ? ' active' : ''}`
+            }
+            onClick={() => setMobileOpen(false)}
+          >
+            Dashboard
           </NavLink>
           <NavLink
             to="/about"
