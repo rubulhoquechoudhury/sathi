@@ -14,51 +14,6 @@ const RISK_LEVEL_COLORS = {
   landslide: { fillColor: '#4B3AC2', fillOpacity: 0.35, color: '#3730A3', weight: 2 }
 };
 
-export default function MapView({ version = "default", height }) {
-  const [zones, setZones] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function fetchLiveZones() {
-      try {
-        const response = await fetch('http://localhost:8000/api/v1/zones');
-        if (response.ok) {
-          const data = await response.json();
-          if (isMounted && Array.isArray(data) && data.length > 0) {
-            setZones(data);
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn('Backend API offline, falling back to static risk zones:', err);
-      }
-
-      if (isMounted) {
-        setZones(fallbackRiskZones);
-        setLoading(false);
-      }
-    }
-
-    fetchLiveZones();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const getStyleForZone = (zone) => {
-    if (zone.risk_level && RISK_LEVEL_COLORS[zone.risk_level]) {
-      return RISK_LEVEL_COLORS[zone.risk_level];
-    }
-    if (zone.type && RISK_LEVEL_COLORS[zone.type]) {
-      return RISK_LEVEL_COLORS[zone.type];
-    }
-    return RISK_LEVEL_COLORS.MODERATE;
-  };
-
   return (
     <div className={`map-wrapper ${version}`}>
       <MapContainer
@@ -66,7 +21,7 @@ export default function MapView({ version = "default", height }) {
         zoom={MAP_ZOOM}
         scrollWheelZoom={true}
         zoomControl={true}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height:'100%', width: '100%' }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
