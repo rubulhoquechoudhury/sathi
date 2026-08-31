@@ -8,8 +8,10 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 from app.database.models import (
-    MonitoredLocation, Sensor, SensorReading, WeatherObservation, CitizenReport, RiskPrediction
+    MonitoredLocation, Sensor, SensorReading, WeatherObservation, CitizenReport, RiskPrediction,
+    DashboardStat, DistrictRiskSummary, SystemAlert, RiskTrend, ActionRecommendation
 )
+
 
 
 class LocationRepository:
@@ -239,3 +241,26 @@ class RiskPredictionRepository:
 
     def get_history(self, limit: int = 100) -> List[RiskPrediction]:
         return self.db.query(RiskPrediction).order_by(desc(RiskPrediction.prediction_timestamp)).limit(limit).all()
+
+
+class DashboardRepository:
+    """Repository for querying operational dashboard metrics."""
+
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_stats(self) -> List[DashboardStat]:
+        return self.db.query(DashboardStat).all()
+
+    def get_district_summaries(self) -> List[DistrictRiskSummary]:
+        return self.db.query(DistrictRiskSummary).order_by(desc(DistrictRiskSummary.landslide_risk_pct)).all()
+
+    def get_active_alerts(self, limit: int = 10) -> List[SystemAlert]:
+        return self.db.query(SystemAlert).filter(SystemAlert.is_active == True).order_by(desc(SystemAlert.created_at)).limit(limit).all()
+
+    def get_risk_trends(self) -> List[RiskTrend]:
+        return self.db.query(RiskTrend).order_by(RiskTrend.day_order.asc()).all()
+
+    def get_active_recommendations(self) -> List[ActionRecommendation]:
+        return self.db.query(ActionRecommendation).filter(ActionRecommendation.is_active == True).order_by(ActionRecommendation.priority.asc()).all()
+

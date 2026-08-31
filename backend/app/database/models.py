@@ -132,3 +132,67 @@ class RiskPrediction(Base):
         Index("idx_risk_pred_loc_time", "location_id", "prediction_timestamp"),
         Index("idx_risk_pred_lat_lon", "latitude", "longitude"),
     )
+
+
+class DistrictRiskSummary(Base):
+    """Regional/District Risk Summary for Operational Dashboard."""
+    __tablename__ = "district_risk_summaries"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    district = Column(String(255), unique=True, nullable=False, index=True)
+    state = Column(String(255), nullable=True)
+    flood_risk_pct = Column(Float, default=0.0, nullable=False)
+    landslide_risk_pct = Column(Float, default=0.0, nullable=False)
+    status = Column(String(50), default="Moderate", nullable=False)  # Low, Moderate, High, Critical
+    people_at_risk = Column(Integer, default=0, nullable=False)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
+
+
+class SystemAlert(Base):
+    """Active Operations & Disaster Alerts."""
+    __tablename__ = "system_alerts"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    alert_type = Column(String(50), nullable=False)  # Flood, Landslide, Rainfall
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=False)
+    severity = Column(String(50), nullable=False)  # Low, Moderate, High, Critical
+    time_ago = Column(String(100), default="Just now", nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+
+
+class RiskTrend(Base):
+    """7-Day Historical and Forecast Risk Trend for Dashboard."""
+    __tablename__ = "risk_trends"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    day_label = Column(String(10), nullable=False)  # Mon, Tue, Wed, Thu, Fri, Sat, Sun
+    day_order = Column(Integer, nullable=False)      # 1 to 7
+    risk_value = Column(Float, nullable=False)       # 0 to 100
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+
+
+class ActionRecommendation(Base):
+    """Operational Recommended Actions for Emergency Responders."""
+    __tablename__ = "action_recommendations"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    recommendation_text = Column(Text, nullable=False)
+    priority = Column(Integer, default=1, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+
+
+class DashboardStat(Base):
+    """Headline Operations Overview Stat Cards."""
+    __tablename__ = "dashboard_stats"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    stat_key = Column(String(100), unique=True, nullable=False)
+    label = Column(String(255), nullable=False)
+    value = Column(String(100), nullable=False)
+    delta = Column(String(255), nullable=False)
+    tone = Column(String(50), nullable=False)  # flood, landslide, risk, rain
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
+

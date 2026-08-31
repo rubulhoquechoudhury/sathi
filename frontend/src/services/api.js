@@ -58,9 +58,11 @@ export const apiService = {
   getLandslideInventory: (state = null, limit = 200) => fetchAPI(`/inventory/landslides?limit=${limit}${state ? `&state=${encodeURIComponent(state)}` : ''}`),
   getNearbyLandslides: (lat, lon, radius = 25) => fetchAPI(`/inventory/nearby?latitude=${lat}&longitude=${lon}&radius_km=${radius}`),
 
-  // 6. Predict
-  predict: (data) => fetchAPI('/api/v1/predictions/predict', { method: 'POST', body: JSON.stringify(data) })
+  // 6. Predict & Dashboard Overview
+  predict: (data) => fetchAPI('/api/v1/predictions/predict', { method: 'POST', body: JSON.stringify(data) }),
+  getDashboardOverview: () => fetchAPI('/api/v1/dashboard/overview')
 };
+
 
 
 /**

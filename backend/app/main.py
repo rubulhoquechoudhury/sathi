@@ -7,18 +7,20 @@ background risk monitoring worker, REST API routers, and WebSockets.
 import logging
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.logging import setup_logging
-from app.database.connection import init_db
+from app.database.connection import init_db, get_db
+
 from app.services.ai_predictor import ai_predictor_service
 from app.workers.risk_monitor import risk_monitor_worker
 from app.websocket.manager import manager
 
 # Route Imports
-from app.api.v1.endpoints import predictions, sensors, weather, reports, risk, zones, model, inventory
+from app.api.v1.endpoints import predictions, sensors, weather, reports, risk, zones, model, inventory, dashboard
 from app.websocket import routes as ws_routes
 
 setup_logging()
@@ -77,12 +79,17 @@ app.include_router(risk.router, prefix=f"{settings.API_V1_STR}/risk", tags=["Ris
 app.include_router(zones.router, prefix=f"{settings.API_V1_STR}", tags=["Zones"])
 app.include_router(model.router, prefix=f"{settings.API_V1_STR}/model", tags=["Model"])
 app.include_router(inventory.router, prefix=f"{settings.API_V1_STR}", tags=["Inventory"])
+app.include_router(dashboard.router, prefix=f"{settings.API_V1_STR}/dashboard", tags=["Dashboard"])
 
 # Mount Native WebSocket Router
 app.include_router(ws_routes.router, tags=["WebSockets"])
 
 
 # Root Aliases for Frontend Compatibility
+@app.get("/dashboard/overview", tags=["Dashboard Alias"])
+def get_dashboard_overview_root_alias(db: Session = Depends(get_db)):
+    return dashboard.get_dashboard_overview(db=db)
+
 @app.get("/zones", tags=["Zones Alias"])
 def get_zones_root_alias():
     return zones.get_risk_zones(ai_service=ai_predictor_service)
@@ -94,6 +101,7 @@ def get_inventory_landslides_root_alias(state: str = None, limit: int = 200, off
 @app.get("/inventory/stats", tags=["Inventory Alias"])
 def get_inventory_stats_root_alias():
     return inventory.get_inventory_stats()
+
 
 
 @app.get("/health", tags=["Health"])

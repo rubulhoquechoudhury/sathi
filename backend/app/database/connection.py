@@ -47,9 +47,19 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def init_db():
-    """Initialize database tables."""
+    """Initialize database tables and seed initial data if empty."""
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables initialized successfully.")
+    try:
+        from app.database.seed import seed_initial_data
+        db = SessionLocal()
+        try:
+            seed_initial_data(db)
+        finally:
+            db.close()
+    except Exception as err:
+        logger.warning(f"Seed initialization warning: {err}")
+
 
 
 def get_db():

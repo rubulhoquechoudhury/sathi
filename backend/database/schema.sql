@@ -90,3 +90,57 @@ CREATE TABLE IF NOT EXISTS `risk_predictions` (
     INDEX `idx_risk_pred_loc_time` (`location_id`, `prediction_timestamp`),
     INDEX `idx_risk_pred_coords` (`latitude`, `longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 7. District Risk Summaries
+CREATE TABLE IF NOT EXISTS `district_risk_summaries` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `district` VARCHAR(255) NOT NULL UNIQUE,
+    `state` VARCHAR(255) NULL,
+    `flood_risk_pct` DOUBLE DEFAULT 0.0 NOT NULL,
+    `landslide_risk_pct` DOUBLE DEFAULT 0.0 NOT NULL,
+    `status` VARCHAR(50) DEFAULT 'Moderate' NOT NULL,
+    `people_at_risk` INT DEFAULT 0 NOT NULL,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 8. System Alerts
+CREATE TABLE IF NOT EXISTS `system_alerts` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `alert_type` VARCHAR(50) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` TEXT NOT NULL,
+    `severity` VARCHAR(50) NOT NULL,
+    `time_ago` VARCHAR(100) DEFAULT 'Just now' NOT NULL,
+    `is_active` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 9. Risk Trends
+CREATE TABLE IF NOT EXISTS `risk_trends` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `day_label` VARCHAR(10) NOT NULL,
+    `day_order` INT NOT NULL,
+    `risk_value` DOUBLE NOT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 10. Action Recommendations
+CREATE TABLE IF NOT EXISTS `action_recommendations` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `recommendation_text` TEXT NOT NULL,
+    `priority` INT DEFAULT 1 NOT NULL,
+    `is_active` TINYINT(1) DEFAULT 1 NOT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 11. Dashboard Stats
+CREATE TABLE IF NOT EXISTS `dashboard_stats` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `stat_key` VARCHAR(100) NOT NULL UNIQUE,
+    `label` VARCHAR(255) NOT NULL,
+    `value` VARCHAR(100) NOT NULL,
+    `delta` VARCHAR(255) NOT NULL,
+    `tone` VARCHAR(50) NOT NULL,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
