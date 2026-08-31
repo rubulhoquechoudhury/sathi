@@ -3,11 +3,10 @@
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background-image: url('/images/background.png');
+  background: linear-gradient(135deg, #f4fbff 0%, #e6f1ffb5 35%, #f8fafd 100%);
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 100% 100%;
-
+  background-size: cover;
 }
 
 @media (max-width: 1500px) {
