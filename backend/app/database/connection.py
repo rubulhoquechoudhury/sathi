@@ -49,6 +49,31 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def init_db():
     """Initialize database tables and seed initial data if empty."""
     Base.metadata.create_all(bind=engine)
+    
+    # Auto-migration check for citizen_reports table columns
+    try:
+        with engine.connect() as conn:
+            from sqlalchemy import text
+            cols = [
+                "disaster_type VARCHAR(50)",
+                "risk_level VARCHAR(50)",
+                "location_name VARCHAR(255)",
+                "reporter_name VARCHAR(255)",
+                "reporter_phone VARCHAR(50)",
+                "verification_status VARCHAR(50) DEFAULT 'PENDING'",
+                "authority_notes TEXT",
+                "verified_by VARCHAR(255)",
+                "verified_at DATETIME"
+            ]
+            for col in cols:
+                try:
+                    conn.execute(text(f"ALTER TABLE citizen_reports ADD COLUMN {col}"))
+                    conn.commit()
+                except Exception:
+                    pass
+    except Exception as e:
+        logger.debug(f"Column migration check note: {e}")
+
     logger.info("Database tables initialized successfully.")
     try:
         from app.database.seed import seed_initial_data

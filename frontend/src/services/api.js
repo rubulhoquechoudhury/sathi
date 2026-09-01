@@ -49,9 +49,15 @@ export const apiService = {
   ingestSensorReading: (data) => fetchAPI('/api/v1/sensors/readings', { method: 'POST', body: JSON.stringify(data) }),
 
 
-  // 4. Citizen Reports
-  getReports: (limit = 50) => fetchAPI(`/api/v1/reports?limit=${limit}`),
+  // 4. Citizen Reports & Volunteer Offers
+  getReports: (limit = 100) => fetchAPI(`/api/v1/reports?limit=${limit}`),
   submitReport: (data) => fetchAPI('/api/v1/reports', { method: 'POST', body: JSON.stringify(data) }),
+  verifyReport: (reportId, data) => fetchAPI(`/api/v1/reports/${reportId}/verify`, { method: 'PUT', body: JSON.stringify(data) }),
+
+  getVolunteers: (limit = 100) => fetchAPI(`/api/v1/volunteers?limit=${limit}`),
+  submitVolunteerOffer: (data) => fetchAPI('/api/v1/volunteers', { method: 'POST', body: JSON.stringify(data) }),
+  updateVolunteerStatus: (offerId, data) => fetchAPI(`/api/v1/volunteers/${offerId}/status`, { method: 'PUT', body: JSON.stringify(data) }),
+
 
   // 5. Landslide Inventory (11,026 SIH26001 Records)
   getInventoryStats: () => fetchAPI('/inventory/stats'),

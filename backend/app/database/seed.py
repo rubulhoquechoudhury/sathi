@@ -7,7 +7,7 @@ import logging
 from sqlalchemy.orm import Session
 from app.database.models import (
     MonitoredLocation, Sensor, DashboardStat, DistrictRiskSummary,
-    SystemAlert, RiskTrend, ActionRecommendation
+    SystemAlert, RiskTrend, ActionRecommendation, VolunteerOffer
 )
 
 logger = logging.getLogger(__name__)
@@ -150,6 +150,47 @@ def seed_initial_data(db: Session) -> None:
             db.add_all(recs)
             db.commit()
             logger.info("Seeded ActionRecommendations.")
+
+        # 8. Volunteer Offers Seeding
+        if db.query(VolunteerOffer).count() == 0:
+            volunteers = [
+                VolunteerOffer(
+                    volunteer_name="Guwahati Relief Squad (Team Lead: Ankur Dutta)",
+                    volunteer_phone="+91 98640 12345",
+                    volunteer_email="ankur.relief@sathi.org",
+                    help_type="Emergency Rescue & Medical Relief",
+                    location_name="Guwahati Khanapara Slope Base",
+                    latitude=26.1380,
+                    longitude=91.7310,
+                    message="Equipped with 2 relief vans, first-aid kits, and emergency ropes for slope evacuation.",
+                    status="OFFERED"
+                ),
+                VolunteerOffer(
+                    volunteer_name="Assam Youth Volunteers (Riya Sen)",
+                    volunteer_phone="+91 97060 54321",
+                    volunteer_email="riya.volunteers@gmail.com",
+                    help_type="Food & Water Distribution",
+                    location_name="Jorabat Relief Camp Station",
+                    latitude=26.1790,
+                    longitude=91.7480,
+                    message="Distributing clean drinking water packets and 300 cooked meal packs for stranded families.",
+                    status="ASSIGNED"
+                ),
+                VolunteerOffer(
+                    volunteer_name="Dr. Sameer Baruah (Mobile Health Unit)",
+                    volunteer_phone="+91 94350 99887",
+                    volunteer_email="dr.baruah@medrelief.in",
+                    help_type="Medical Assistance",
+                    location_name="GS Road Medical Post",
+                    latitude=26.1510,
+                    longitude=91.7410,
+                    message="Mobile ambulance and emergency trauma first aid kit ready for landslide injury support.",
+                    status="OFFERED"
+                )
+            ]
+            db.add_all(volunteers)
+            db.commit()
+            logger.info(f"Seeded {len(volunteers)} VolunteerOffers.")
 
     except Exception as err:
         logger.error(f"Error seeding initial database data: {err}")

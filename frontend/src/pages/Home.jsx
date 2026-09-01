@@ -1,6 +1,6 @@
 import MapView from '../components/MapView';
 import { GoShieldCheck } from "react-icons/go";
-import { FaBell } from "react-icons/fa6";
+import { FaBell, FaFileContract } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
 import './home.css'
 
@@ -30,11 +30,18 @@ export default function Home() {
             <Link to={'/dashboard'} className='explore-dashboard-btn button'>
               Explore Dashboard
             </Link>
+
+            
+            <Link to={'/report'} className='explore-dashboard-btn button'>
+            <FaFileContract />
+              Ground Report
+            </Link>
           </div>
         </div>
-        <Link to={'/liveMap'} className='right' >
+         <Link to={'/livemap'}  className='right' >
           <MapView version='home'></MapView>
         </Link>
+      
 
       </div>
     </div>

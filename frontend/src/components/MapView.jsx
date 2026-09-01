@@ -1,10 +1,41 @@
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Polygon, Tooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Tooltip, Marker, Popup, Circle } from 'react-leaflet';
+import L from 'leaflet';
 import MapLegend from './MapLegend';
 import { riskZones as staticRiskZones, MAP_CENTER, MAP_ZOOM } from '../data/riskZones';
 import { apiService } from '../services/api';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
+
+// Fix for default Leaflet icon assets in React
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Custom RED pin icon for citizen help requests
+const redCitizenMarkerIcon = L.divIcon({
+  className: 'citizen-red-marker',
+  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#EF4444" width="34" height="34" stroke="#ffffff" stroke-width="1.5">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+  </svg>`,
+  iconSize: [34, 34],
+  iconAnchor: [17, 34],
+  popupAnchor: [0, -34]
+});
+
+// Custom GREEN pin icon for volunteer help offers
+const greenVolunteerMarkerIcon = L.divIcon({
+  className: 'volunteer-green-marker',
+  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#10B981" width="34" height="34" stroke="#ffffff" stroke-width="1.5">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm-1 11.5l-3.5-3.5 1.41-1.41L11 10.67l5.09-5.09 1.41 1.41L11 13.5z"/>
+  </svg>`,
+  iconSize: [34, 34],
+  iconAnchor: [17, 34],
+  popupAnchor: [0, -34]
+});
 
 // 4-Tier Risk Category Styles & Alert Badges
 const CATEGORY_STYLES = {
@@ -58,6 +89,8 @@ const CATEGORY_STYLES = {
 export default function MapView({ version = "default", height }) {
   const [zones, setZones] = useState(staticRiskZones);
   const [selectedZone, setSelectedZone] = useState(null);
+  const [acceptedReports, setAcceptedReports] = useState([]);
+  const [volunteerOffers, setVolunteerOffers] = useState([]);
 
   useEffect(() => {
     async function fetchLiveZones() {
@@ -72,7 +105,32 @@ export default function MapView({ version = "default", height }) {
         if (!selectedZone) setSelectedZone(staticRiskZones[0]);
       }
     }
+
+    async function fetchAcceptedReports() {
+      try {
+        const reports = await apiService.getReports(200);
+        if (Array.isArray(reports)) {
+          setAcceptedReports(reports);
+        }
+      } catch (err) {
+        console.warn('[MapView] Could not fetch citizen reports:', err.message);
+      }
+    }
+
+    async function fetchVolunteerOffers() {
+      try {
+        const offers = await apiService.getVolunteers(200);
+        if (Array.isArray(offers)) {
+          setVolunteerOffers(offers);
+        }
+      } catch (err) {
+        console.warn('[MapView] Could not fetch volunteer offers:', err.message);
+      }
+    }
+
     fetchLiveZones();
+    fetchAcceptedReports();
+    fetchVolunteerOffers();
   }, []);
 
   const getRiskCategory = (zone) => {
@@ -132,6 +190,7 @@ export default function MapView({ version = "default", height }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        {/* Render Risk Zone Polygons */}
         {zones.map((zone) => {
           const catKey = getRiskCategory(zone);
           const styleConfig = CATEGORY_STYLES[catKey] || CATEGORY_STYLES.LOW;
@@ -163,7 +222,6 @@ export default function MapView({ version = "default", height }) {
                     fontWeight: '700',
                     fontSize: '12px',
                     color: zone.type === 'flood' ? '#2563EB' : '#DC2626',
-
                     marginBottom: '4px'
                   }}>
                     {proneLabel}
@@ -197,6 +255,96 @@ export default function MapView({ version = "default", height }) {
             </Polygon>
           );
         })}
+
+        {/* Render 🔴 RED Citizen Incident Help Request Markers */}
+        {acceptedReports.map((report) => (
+          <g key={`report-group-${report.id}`}>
+            <Marker
+              position={[report.latitude, report.longitude]}
+              icon={redCitizenMarkerIcon}
+            >
+              <Popup>
+                <div style={{ minWidth: '220px', padding: '2px' }}>
+                  <div style={{
+                    display: 'inline-block',
+                    background: '#FEE2E2',
+                    color: '#991B1B',
+                    fontWeight: '800',
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    marginBottom: '6px'
+                  }}>
+                    🔴 CITIZEN HELP REQUEST
+                  </div>
+                  <h4 style={{ fontSize: '13px', margin: '0 0 4px 0', color: '#0F172A' }}>
+                    📍 {report.location_name || `Location (${report.latitude}, ${report.longitude})`}
+                  </h4>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#DC2626', marginBottom: '4px' }}>
+                    Incident Type: {(report.disaster_type || 'landslide').toUpperCase()} (Risk: {(report.risk_level || 'moderate').toUpperCase()})
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#475569', margin: '0 0 6px 0', lineHeight: '1.4' }}>
+                    {report.description || 'No description provided.'}
+                  </p>
+
+                  <div style={{ fontSize: '10px', color: '#64748B', borderTop: '1px solid #E2E8F0', paddingTop: '4px' }}>
+                    <strong>Reporter:</strong> {report.reporter_name || 'Anonymous Citizen'} ({report.reporter_phone || 'N/A'})
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          </g>
+        ))}
+
+        {/* Render 🟢 GREEN Volunteer Assistance Locations */}
+        {volunteerOffers.map((offer) => (
+          <g key={`volunteer-group-${offer.id}`}>
+            <Marker
+              position={[offer.latitude, offer.longitude]}
+              icon={greenVolunteerMarkerIcon}
+            >
+              <Popup>
+                <div style={{ minWidth: '220px', padding: '2px' }}>
+                  <div style={{
+                    display: 'inline-block',
+                    background: '#DCFCE7',
+                    color: '#166534',
+                    fontWeight: '800',
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    marginBottom: '6px'
+                  }}>
+                    🟢 VOLUNTEER HELP OFFERED
+                  </div>
+                  <h4 style={{ fontSize: '13px', margin: '0 0 4px 0', color: '#0F172A' }}>
+                    🙋 {offer.volunteer_name}
+                  </h4>
+                  <div style={{ fontSize: '11px', fontWeight: '700', color: '#059669', marginBottom: '4px' }}>
+                    Assistance: {offer.help_type}
+                  </div>
+                  <p style={{ fontSize: '11px', color: '#475569', margin: '0 0 6px 0' }}>
+                    📍 {offer.location_name}
+                  </p>
+                  <div style={{ fontSize: '10px', color: '#64748B', borderTop: '1px solid #E2E8F0', paddingTop: '4px' }}>
+                    <strong>Contact:</strong> {offer.volunteer_phone} | <strong>Status:</strong> {offer.status || 'OFFERED'}
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+
+            <Circle
+              center={[offer.latitude, offer.longitude]}
+              radius={600}
+              pathOptions={{
+                color: '#10B981',
+                fillColor: '#22C55E',
+                fillOpacity: 0.25,
+                weight: 2
+              }}
+            />
+          </g>
+        ))}
       </MapContainer>
 
       {/* Selected Zone Telemetry Overlay Panel */}
@@ -206,7 +354,6 @@ export default function MapView({ version = "default", height }) {
             <div>
               <div className="zone-telemetry-panel__title">{selectedZone.name}</div>
               <div style={{ fontSize: '12px', fontWeight: '700', color: selectedZone.type === 'flood' ? '#2563EB' : '#DC2626', marginTop: '2px' }}>
-
                 {getProneLabel(selectedZone)}
               </div>
               <span style={{

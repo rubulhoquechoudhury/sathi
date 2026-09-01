@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 from app.database.models import (
-    MonitoredLocation, Sensor, SensorReading, WeatherObservation, CitizenReport, RiskPrediction,
+    MonitoredLocation, Sensor, SensorReading, WeatherObservation, CitizenReport, VolunteerOffer, RiskPrediction,
     DashboardStat, DistrictRiskSummary, SystemAlert, RiskTrend, ActionRecommendation
 )
 
@@ -192,15 +192,108 @@ class CitizenReportRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_report(self, lat: float, lon: float, severity: int, description: str, image_url: Optional[str] = None) -> CitizenReport:
-        rep = CitizenReport(latitude=lat, longitude=lon, severity=severity, description=description, image_url=image_url)
+    def create_report(
+        self,
+        lat: float,
+        lon: float,
+        severity: int = 1,
+        description: str = "",
+        image_url: Optional[str] = None,
+        disaster_type: str = "landslide",
+        risk_level: str = "moderate",
+        location_name: Optional[str] = None,
+        reporter_name: Optional[str] = None,
+        reporter_phone: Optional[str] = None
+    ) -> CitizenReport:
+        rep = CitizenReport(
+            latitude=lat,
+            longitude=lon,
+            severity=severity,
+            disaster_type=disaster_type,
+            risk_level=risk_level,
+            location_name=location_name,
+            reporter_name=reporter_name,
+            reporter_phone=reporter_phone,
+            description=description,
+            image_url=image_url,
+            verification_status="PENDING"
+        )
         self.db.add(rep)
         self.db.commit()
         self.db.refresh(rep)
         return rep
 
-    def get_all(self, limit: int = 50) -> List[CitizenReport]:
+    def verify_report(
+        self,
+        report_id: int,
+        verification_status: str,
+        authority_notes: Optional[str] = None,
+        verified_by: str = "Admin Authority"
+    ) -> Optional[CitizenReport]:
+        rep = self.db.query(CitizenReport).filter(CitizenReport.id == report_id).first()
+        if not rep:
+            return None
+        rep.verification_status = verification_status
+        if authority_notes is not None:
+            rep.authority_notes = authority_notes
+        rep.verified_by = verified_by
+        rep.verified_at = datetime.now(timezone.utc)
+        self.db.commit()
+        self.db.refresh(rep)
+        return rep
+
+    def get_all(self, limit: int = 100) -> List[CitizenReport]:
         return self.db.query(CitizenReport).order_by(desc(CitizenReport.created_at)).limit(limit).all()
+
+
+class VolunteerOfferRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create_offer(
+        self,
+        volunteer_name: str,
+        volunteer_phone: str,
+        location_name: str,
+        lat: float,
+        lon: float,
+        volunteer_email: Optional[str] = None,
+        help_type: str = "General Relief",
+        target_report_id: Optional[int] = None,
+        message: Optional[str] = None
+    ) -> VolunteerOffer:
+        offer = VolunteerOffer(
+            volunteer_name=volunteer_name,
+            volunteer_phone=volunteer_phone,
+            volunteer_email=volunteer_email,
+            help_type=help_type,
+            location_name=location_name,
+            latitude=lat,
+            longitude=lon,
+            target_report_id=target_report_id,
+            message=message,
+            status="OFFERED"
+        )
+        self.db.add(offer)
+        self.db.commit()
+        self.db.refresh(offer)
+        return offer
+
+    def get_all(self, limit: int = 100) -> List[VolunteerOffer]:
+        return self.db.query(VolunteerOffer).order_by(desc(VolunteerOffer.created_at)).limit(limit).all()
+
+    def get_by_id(self, offer_id: int) -> Optional[VolunteerOffer]:
+        return self.db.query(VolunteerOffer).filter(VolunteerOffer.id == offer_id).first()
+
+    def update_status(self, offer_id: int, status: str) -> Optional[VolunteerOffer]:
+        offer = self.get_by_id(offer_id)
+        if not offer:
+            return None
+        offer.status = status
+        self.db.commit()
+        self.db.refresh(offer)
+        return offer
+
 
 
 class RiskPredictionRepository:

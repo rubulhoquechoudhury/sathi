@@ -21,7 +21,7 @@ This package provides a clean, robust interface for extracting 64-dimensional pr
    ```bash
    export EARTHENGINE_PROJECT="your-gee-project-id"
    # On Windows PowerShell:
-   $env:EARTHENGINE_PROJECT="your-gee-project-id"
+   $env:EARTHENGINE_PROJECT="sathi-507115"
    ```
 
 4. **Configuring the Official AlphaEarth Asset ID**:

@@ -3,7 +3,6 @@ import { apiService } from '../services/api';
 import MapView from '../components/MapView';
 import ModelStatusCard from '../components/ModelStatusCard';
 import IoTSensorPanel from '../components/IoTSensorPanel';
-import CitizenReportCard from '../components/CitizenReportCard';
 import './dashboard.css';
 
 const DEFAULT_STAT_CARDS = [
@@ -294,38 +293,11 @@ export default function Dashboard() {
         >
           IoT Sensor Telemetry & Simulation
         </button>
-        <button
-          onClick={() => setActiveTab('reports')}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '6px',
-            border: 'none',
-            fontWeight: '700',
-            fontSize: '13px',
-            cursor: 'pointer',
-            background: activeTab === 'reports' ? '#0F172A' : '#F1F5F9',
-            color: activeTab === 'reports' ? 'white' : '#475569'
-          }}
-        >
-          Citizen Ground-Truth Reports
-        </button>
       </div>
 
       {/* TAB 1: Operations Risk Grid */}
       {activeTab === 'overview' && (
         <>
-          <section className="stats-grid" style={{ marginTop: '16px' }}>
-            {statCards.map((card) => (
-              <article key={card.label} className={`stat-card stat-card--${card.tone}`}>
-                <div className="stat-card__label-row">
-                  <span className="stat-card__label">{card.label}</span>
-                  <span className="stat-card__dot" />
-                </div>
-                <div className="stat-card__value">{card.value}</div>
-                <div className="stat-card__delta">{card.delta}</div>
-              </article>
-            ))}
-          </section>
 
           <section className="dashboard-grid">
             <article className="panel risk-panel">
@@ -427,11 +399,6 @@ export default function Dashboard() {
       {/* TAB 3: IoT Sensor Telemetry Panel */}
       {activeTab === 'iot' && (
         <IoTSensorPanel />
-      )}
-
-      {/* TAB 4: Citizen Ground-Truth Reports */}
-      {activeTab === 'reports' && (
-        <CitizenReportCard />
       )}
     </div>
   );

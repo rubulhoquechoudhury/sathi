@@ -20,7 +20,7 @@ from app.workers.risk_monitor import risk_monitor_worker
 from app.websocket.manager import manager
 
 # Route Imports
-from app.api.v1.endpoints import predictions, sensors, weather, reports, risk, zones, model, inventory, dashboard
+from app.api.v1.endpoints import predictions, sensors, weather, reports, volunteers, risk, zones, model, inventory, dashboard
 from app.websocket import routes as ws_routes
 
 setup_logging()
@@ -75,6 +75,7 @@ app.include_router(predictions.router, prefix=f"{settings.API_V1_STR}/prediction
 app.include_router(sensors.router, prefix=f"{settings.API_V1_STR}/sensors", tags=["Sensors"])
 app.include_router(weather.router, prefix=f"{settings.API_V1_STR}/weather", tags=["Weather"])
 app.include_router(reports.router, prefix=f"{settings.API_V1_STR}/reports", tags=["Reports"])
+app.include_router(volunteers.router, prefix=f"{settings.API_V1_STR}/volunteers", tags=["Volunteers"])
 app.include_router(risk.router, prefix=f"{settings.API_V1_STR}/risk", tags=["Risk"])
 app.include_router(zones.router, prefix=f"{settings.API_V1_STR}", tags=["Zones"])
 app.include_router(model.router, prefix=f"{settings.API_V1_STR}/model", tags=["Model"])
@@ -101,6 +102,37 @@ def get_inventory_landslides_root_alias(state: str = None, limit: int = 200, off
 @app.get("/inventory/stats", tags=["Inventory Alias"])
 def get_inventory_stats_root_alias():
     return inventory.get_inventory_stats()
+
+@app.post("/reports", tags=["Reports Alias"])
+@app.post("/api/reports", tags=["Reports Alias"])
+def create_report_root_alias(report: reports.CitizenReportCreate, db: Session = Depends(get_db)):
+    return reports.submit_citizen_report(report=report, db=db)
+
+@app.get("/reports", tags=["Reports Alias"])
+@app.get("/api/reports", tags=["Reports Alias"])
+def get_reports_root_alias(limit: int = 100, db: Session = Depends(get_db)):
+    return reports.get_citizen_reports(limit=limit, db=db)
+
+@app.put("/reports/{report_id}/verify", tags=["Reports Alias"])
+@app.put("/api/reports/{report_id}/verify", tags=["Reports Alias"])
+def verify_report_root_alias(report_id: int, payload: reports.CitizenReportVerify, db: Session = Depends(get_db)):
+    return reports.verify_citizen_report(report_id=report_id, payload=payload, db=db)
+
+@app.post("/volunteers", tags=["Volunteers Alias"])
+@app.post("/api/volunteers", tags=["Volunteers Alias"])
+def create_volunteer_root_alias(payload: volunteers.VolunteerOfferCreate, db: Session = Depends(get_db)):
+    return volunteers.submit_volunteer_offer(payload=payload, db=db)
+
+@app.get("/volunteers", tags=["Volunteers Alias"])
+@app.get("/api/volunteers", tags=["Volunteers Alias"])
+def get_volunteers_root_alias(limit: int = 100, db: Session = Depends(get_db)):
+    return volunteers.get_volunteer_offers(limit=limit, db=db)
+
+@app.put("/volunteers/{offer_id}/status", tags=["Volunteers Alias"])
+@app.put("/api/volunteers/{offer_id}/status", tags=["Volunteers Alias"])
+def update_volunteer_status_alias(offer_id: int, payload: volunteers.VolunteerOfferUpdateStatus, db: Session = Depends(get_db)):
+    return volunteers.update_volunteer_status(offer_id=offer_id, payload=payload, db=db)
+
 
 
 

@@ -103,9 +103,38 @@ class CitizenReport(Base):
     latitude = Column(Float, nullable=False, index=True)
     longitude = Column(Float, nullable=False, index=True)
     severity = Column(Integer, default=1, nullable=False)
+    disaster_type = Column(String(50), nullable=True, default="landslide")
+    risk_level = Column(String(50), nullable=True, default="moderate")
+    location_name = Column(String(255), nullable=True)
+    reporter_name = Column(String(255), nullable=True)
+    reporter_phone = Column(String(50), nullable=True)
     description = Column(Text, nullable=True)
     image_url = Column(String(500), nullable=True)
+    verification_status = Column(String(50), nullable=False, default="PENDING")
+    authority_notes = Column(Text, nullable=True)
+    verified_by = Column(String(255), nullable=True)
+    verified_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utc_now, nullable=False)
+
+
+class VolunteerOffer(Base):
+    """Volunteer Offers / Applications to Help Citizens in Disaster / Risk Areas."""
+    __tablename__ = "volunteer_offers"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    volunteer_name = Column(String(255), nullable=False)
+    volunteer_phone = Column(String(50), nullable=False)
+    volunteer_email = Column(String(255), nullable=True)
+    help_type = Column(String(100), default="General Relief", nullable=False)
+    location_name = Column(String(255), nullable=False)
+    latitude = Column(Float, nullable=False, index=True)
+    longitude = Column(Float, nullable=False, index=True)
+    target_report_id = Column(Integer, ForeignKey("citizen_reports.id"), nullable=True)
+    message = Column(Text, nullable=True)
+    status = Column(String(50), default="OFFERED", nullable=False)  # OFFERED, ASSIGNED, COMPLETED, REJECTED
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+
+    target_report = relationship("CitizenReport")
 
 
 class RiskPrediction(Base):
