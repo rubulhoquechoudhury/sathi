@@ -7,8 +7,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from preprocessing.feature_builder import FeatureBuilder
-from preprocessing.feature_schema import FeatureSchema
+from ai.preprocessing.feature_builder import FeatureBuilder
+from ai.preprocessing.feature_schema import FeatureSchema
 
 
 def test_feature_builder_alphaearth_embedding_dim():
@@ -77,6 +77,6 @@ def test_schema_save_and_load():
 
         assert loaded.embedding_dim == 64
         assert loaded.feature_names == schema.feature_names
-        assert loaded.categorical_mappings == schema.categorical_mappings
+        assert loaded.categorical_values == schema.categorical_values
     finally:
         tmp_path.unlink(missing_ok=True)

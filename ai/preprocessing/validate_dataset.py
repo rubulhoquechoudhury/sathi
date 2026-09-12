@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Dict, Any, List, Set
 from datetime import datetime
 
-from config.config import get_default_config
-from preprocessing.load_jsonl import load_jsonl_dataset
+from ai.config.config import get_default_config
+from ai.preprocessing.load_jsonl import load_jsonl_dataset
 
 logger = logging.getLogger("validate_dataset")
 

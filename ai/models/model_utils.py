@@ -11,7 +11,10 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 
-from config.config import get_default_config
+try:
+    from ai.config.config import get_default_config
+except ImportError:
+    from config.config import get_default_config
 
 logger = logging.getLogger(__name__)
 

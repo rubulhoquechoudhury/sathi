@@ -1,26 +1,22 @@
 export default function MapLegend() {
   return (
     <div className="map-legend">
-      <div className="map-legend__title">AI Landslide Risk Levels</div>
+      <div className="map-legend__title">Risk Categories</div>
       <div className="map-legend__item">
-        <span className="map-legend__dot" style={{ backgroundColor: '#DC2626' }} />
-        Critical Risk (75-100%)
+        <span className="map-legend__dot map-legend__dot--critical" />
+        Critical Risk
       </div>
       <div className="map-legend__item">
-        <span className="map-legend__dot" style={{ backgroundColor: '#EA580C' }} />
-        High Risk (50-75%)
+        <span className="map-legend__dot map-legend__dot--high" />
+        High Risk
       </div>
       <div className="map-legend__item">
-        <span className="map-legend__dot" style={{ backgroundColor: '#D97706' }} />
-        Moderate Risk (25-50%)
-      </div>
-      <div className="map-legend__item">
-        <span className="map-legend__dot" style={{ backgroundColor: '#16A34A' }} />
-        Low Risk (0-25%)
-      </div>
-      <div className="map-legend__item">
-        <span className="map-legend__dot" style={{ backgroundColor: '#0DAFAB' }} />
+        <span className="map-legend__dot map-legend__dot--flood-plain" />
         Flood Plain Risk
+      </div>
+      <div className="map-legend__item">
+        <span className="map-legend__dot map-legend__dot--low" />
+        Low Risk
       </div>
     </div>
   );

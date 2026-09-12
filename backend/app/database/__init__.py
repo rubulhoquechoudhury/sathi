@@ -1,12 +1,23 @@
-"""Database module."""
-from app.database.session import Base, engine, get_db, init_db
-from app.database.models import LandslideAssessment, CitizenReport
+"""Database package."""
+from app.database.connection import Base, engine, get_db, init_db
+from app.database.models import (
+    MonitoredLocation,
+    Sensor,
+    SensorReading,
+    CitizenReport,
+    RiskPrediction,
+    WeatherObservation
+)
 
 __all__ = [
     "Base",
     "engine",
     "get_db",
     "init_db",
-    "LandslideAssessment",
-    "CitizenReport"
+    "MonitoredLocation",
+    "Sensor",
+    "SensorReading",
+    "CitizenReport",
+    "RiskPrediction",
+    "WeatherObservation"
 ]

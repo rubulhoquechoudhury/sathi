@@ -28,7 +28,7 @@ export default function Header({ isLoggedIn, onLogout }) {
                 home
               </NavLink>
 
-               <NavLink
+              <NavLink
                 to="/liveMap"
                 className={({ isActive }) =>
                   `header__nav-link${isActive ? ' active' : ''}`
@@ -63,20 +63,10 @@ export default function Header({ isLoggedIn, onLogout }) {
                 Contact
               </NavLink>
 
-               
+
             </nav>
 
-            {/* Profile button */}
-            <button
-              className="header__profile-btn"
-              onClick={() => setShowProfile(true)}
-              aria-label="User profile"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            </button>
+
 
             {/* Mobile hamburger */}
             <button
@@ -104,7 +94,7 @@ export default function Header({ isLoggedIn, onLogout }) {
       {/* Mobile nav dropdown */}
       {mobileOpen && (
         <nav className="header__mobile-nav">
-           <NavLink
+          <NavLink
             to="/"
             className={({ isActive }) =>
               `header__nav-link${isActive ? ' active' : ''}`
@@ -113,7 +103,7 @@ export default function Header({ isLoggedIn, onLogout }) {
           >
             home
           </NavLink>
-           <NavLink
+          <NavLink
             to="/liveMap"
             className={({ isActive }) =>
               `header__nav-link${isActive ? ' active' : ''}`
@@ -140,6 +130,7 @@ export default function Header({ isLoggedIn, onLogout }) {
           >
             About
           </NavLink>
+
           <NavLink
             to="/contact"
             className={({ isActive }) =>

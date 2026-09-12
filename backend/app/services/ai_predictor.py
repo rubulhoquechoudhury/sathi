@@ -1,84 +1,63 @@
 """
-AI Prediction Service interfacing with the trained XGBoost model and feature schema.
+Singleton AI Model Provider for FastAPI Application Lifespan.
+Preloads trained LandslidePredictor once at startup.
 """
 
 import sys
 import logging
 from pathlib import Path
-from typing import Dict, Any, Optional
-
+from typing import Optional, Dict, Any
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Ensure ai directory (which contains models, preprocessing, config) is on sys.path
-ai_dir = str(settings.ROOT_DIR / "ai")
-if ai_dir not in sys.path:
-    sys.path.insert(0, ai_dir)
-
-try:
-    from models.predict import LandslidePredictor
-    MODEL_ENGINE_AVAILABLE = True
-except ImportError as err:
-    logger.warning(f"Could not import AI prediction engine from ai module: {err}")
-    LandslidePredictor = None
-    MODEL_ENGINE_AVAILABLE = False
+# Ensure project root directory is in sys.path so 'ai' package imports seamlessly
+backend_dir = Path(__file__).resolve().parent.parent.parent
+project_root = backend_dir.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 
 class AIPredictionService:
-    """Singleton service wrapper for loading model artifacts and generating predictions."""
+    """Preloads trained XGBoost AI Model once during FastAPI startup."""
 
-    _instance: Optional["AIPredictionService"] = None
-
-    def __init__(self, model_dir: Optional[Path] = None) -> None:
-        self.model_dir = model_dir or settings.AI_MODEL_DIR
-        self.predictor: Optional[LandslidePredictor] = None
+    def __init__(self) -> None:
+        self.predictor = None
         self.is_loaded = False
-        self.load_error: Optional[str] = None
-        self._load_model()
 
-    def _load_model(self) -> None:
-        """Attempt to load trained XGBoost model and feature schema."""
-        if not MODEL_ENGINE_AVAILABLE:
-            self.load_error = "AI model import dependencies missing."
-            return
-
+    def load_model(self) -> None:
+        """Preload trained model from ai/saved_models/current or configured directory."""
         try:
-            if not self.model_dir.exists():
-                self.load_error = f"Model directory does not exist: {self.model_dir}"
-                logger.warning(self.load_error)
-                return
+            from ai.inference.predictor import LandslidePredictor
 
-            self.predictor = LandslidePredictor(model_dir=self.model_dir)
+            # Resolve model directory
+            model_dir = (backend_dir / settings.MODEL_DIR).resolve()
+
+            if not model_dir.exists():
+                # Fallback to ai/saved_models/current or backend/ai/saved_models
+                model_dir = project_root / "ai" / "saved_models" / "current"
+                if not model_dir.exists():
+                    model_dir = backend_dir / "ai" / "saved_models"
+
+            self.predictor = LandslidePredictor(model_dir=model_dir)
             self.is_loaded = True
-            logger.info(f"AIPredictionService loaded model successfully from {self.model_dir}")
+            logger.info(f"AI Model version '{self.predictor.model_version}' preloaded successfully from {model_dir}")
+
         except Exception as err:
-            self.load_error = str(err)
-            logger.error(f"Failed to load AI model from {self.model_dir}: {err}")
+            logger.error(f"Failed to preload AI Model: {err}")
+            self.is_loaded = False
 
-    def predict(self, record_dict: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Generate landslide risk prediction for sample dict.
-
-        Args:
-            record_dict: Dictionary payload matching schema.
-
-        Returns:
-            Dictionary containing landslide_probability, risk_score, and risk_level.
-        """
+    def predict(self, record: Dict[str, Any]) -> Dict[str, Any]:
+        """Run inference through preloaded AI Predictor."""
         if not self.is_loaded or self.predictor is None:
-            raise RuntimeError(f"AI Model is not loaded. Details: {self.load_error}")
-
-        return self.predictor.predict_sample(record_dict)
+            raise RuntimeError("AI Model Predictor is not loaded.")
+        return self.predictor.predict(record)
 
 
 # Global Singleton Instance
-_service_instance: Optional[AIPredictionService] = None
+ai_predictor_service = AIPredictionService()
 
 
 def get_ai_predictor() -> AIPredictionService:
-    """Dependency injection helper returning singleton AIPredictionService instance."""
-    global _service_instance
-    if _service_instance is None:
-        _service_instance = AIPredictionService()
-    return _service_instance
+    """Dependency injector for AIPredictionService."""
+    return ai_predictor_service

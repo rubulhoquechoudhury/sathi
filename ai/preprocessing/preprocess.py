@@ -9,9 +9,9 @@ from typing import List, Dict, Any, Tuple, Optional, Union
 
 import numpy as np
 
-from preprocessing.load_jsonl import load_jsonl_dataset
-from preprocessing.feature_schema import FeatureSchema
-from preprocessing.feature_builder import FeatureBuilder
+from ai.preprocessing.load_jsonl import load_jsonl_dataset
+from ai.preprocessing.feature_schema import FeatureSchema
+from ai.preprocessing.feature_builder import FeatureBuilder
 
 logger = logging.getLogger(__name__)
 

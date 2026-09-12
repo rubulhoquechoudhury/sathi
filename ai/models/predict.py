@@ -11,10 +11,10 @@ import logging
 from pathlib import Path
 from typing import Dict, Any, Union
 
-from config.config import get_default_config, Config
-from preprocessing.feature_schema import FeatureSchema
-from preprocessing.feature_builder import FeatureBuilder
-from models.model_utils import load_xgboost_model, compute_risk_level
+from ai.config.config import get_default_config, Config
+from ai.preprocessing.feature_schema import FeatureSchema
+from ai.preprocessing.feature_builder import FeatureBuilder
+from ai.models.model_utils import load_xgboost_model, compute_risk_level
 
 logger = logging.getLogger("predict")
 

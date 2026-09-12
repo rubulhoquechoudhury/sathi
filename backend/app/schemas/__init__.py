@@ -1,23 +1,17 @@
-"""Pydantic API schemas."""
-from app.schemas.health import HealthCheckResponse
-from app.schemas.landslide import (
-    LocationInput,
-    TerrainInput,
-    RainfallInput,
-    LandslidePredictionRequest,
-    LandslidePredictionResponse,
-    AssessmentLogResponse
-)
-from app.schemas.citizen import CitizenReportCreate, CitizenReportResponse
+"""Schemas package."""
+from app.schemas.prediction import PredictionRequest, PredictionResponse
+from app.schemas.sensor import SensorReadingCreate, SensorResponse
+from app.schemas.report import CitizenReportCreate, CitizenReportResponse, RiskMapResponse
+from app.schemas.weather import WeatherObservationCreate, WeatherObservationResponse
 
 __all__ = [
-    "HealthCheckResponse",
-    "LocationInput",
-    "TerrainInput",
-    "RainfallInput",
-    "LandslidePredictionRequest",
-    "LandslidePredictionResponse",
-    "AssessmentLogResponse",
+    "PredictionRequest",
+    "PredictionResponse",
+    "SensorReadingCreate",
+    "SensorResponse",
     "CitizenReportCreate",
-    "CitizenReportResponse"
+    "CitizenReportResponse",
+    "RiskMapResponse",
+    "WeatherObservationCreate",
+    "WeatherObservationResponse"
 ]
