@@ -47,24 +47,6 @@ export default function Header({ isLoggedIn, onLogout }) {
               </NavLink>
 
               <NavLink
-                to="/report"
-                className={({ isActive }) =>
-                  `header__nav-link${isActive ? ' active' : ''}`
-                }
-              >
-                Report
-              </NavLink>
-
-              <NavLink
-                to="/sathi"
-                className={({ isActive }) =>
-                  `header__nav-link${isActive ? ' active' : ''}`
-                }
-              >
-                Sathi Help
-              </NavLink>
-
-              <NavLink
                 to="/about"
                 className={({ isActive }) =>
                   `header__nav-link${isActive ? ' active' : ''}`
@@ -138,33 +120,6 @@ export default function Header({ isLoggedIn, onLogout }) {
             onClick={() => setMobileOpen(false)}
           >
             Dashboard
-          </NavLink>
-          <NavLink
-            to="/report"
-            className={({ isActive }) =>
-              `header__nav-link${isActive ? ' active' : ''}`
-            }
-            onClick={() => setMobileOpen(false)}
-          >
-            Report
-          </NavLink>
-          <NavLink
-            to="/sathi"
-            className={({ isActive }) =>
-              `header__nav-link${isActive ? ' active' : ''}`
-            }
-            onClick={() => setMobileOpen(false)}
-          >
-            Sathi Help
-          </NavLink>
-          <NavLink
-            to="/admin"
-            className={({ isActive }) =>
-              `header__nav-link${isActive ? ' active' : ''}`
-            }
-            onClick={() => setMobileOpen(false)}
-          >
-            Admin
           </NavLink>
           <NavLink
             to="/about"

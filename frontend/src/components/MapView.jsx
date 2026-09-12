@@ -86,96 +86,6 @@ const CATEGORY_STYLES = {
   },
 };
 
-export default function MapView({ version = "default", height }) {
-  const [zones, setZones] = useState(staticRiskZones);
-  const [selectedZone, setSelectedZone] = useState(null);
-  const [acceptedReports, setAcceptedReports] = useState([]);
-  const [volunteerOffers, setVolunteerOffers] = useState([]);
-
-  useEffect(() => {
-    async function fetchLiveZones() {
-      try {
-        const data = await apiService.getZones();
-        if (Array.isArray(data) && data.length > 0) {
-          setZones(data);
-          if (!selectedZone) setSelectedZone(data[0]);
-        }
-      } catch (err) {
-        console.warn('[MapView] Using static risk zones fallback:', err.message);
-        if (!selectedZone) setSelectedZone(staticRiskZones[0]);
-      }
-    }
-
-    async function fetchAcceptedReports() {
-      try {
-        const reports = await apiService.getReports(200);
-        if (Array.isArray(reports)) {
-          setAcceptedReports(reports);
-        }
-      } catch (err) {
-        console.warn('[MapView] Could not fetch citizen reports:', err.message);
-      }
-    }
-
-    async function fetchVolunteerOffers() {
-      try {
-        const offers = await apiService.getVolunteers(200);
-        if (Array.isArray(offers)) {
-          setVolunteerOffers(offers);
-        }
-      } catch (err) {
-        console.warn('[MapView] Could not fetch volunteer offers:', err.message);
-      }
-    }
-
-    fetchLiveZones();
-    fetchAcceptedReports();
-    fetchVolunteerOffers();
-  }, []);
-
-  const getRiskCategory = (zone) => {
-    if (!zone) return 'LOW';
-    const cat = (zone.risk_category || zone.risk_level || '').toUpperCase().replace(/\s+/g, '_');
-
-    if (cat.includes('CRITICAL')) return 'CRITICAL';
-    if (cat.includes('HIGH')) return 'HIGH';
-    if (cat.includes('FLOOD') || cat.includes('PLAIN') || zone.type === 'flood') return 'FLOOD_PLAIN';
-    if (cat.includes('LOW')) return 'LOW';
-
-    const prob = zone.landslide_probability || 0.0;
-    if (prob >= 0.80) return 'CRITICAL';
-    if (prob >= 0.50) return 'HIGH';
-    if (prob >= 0.25) return 'FLOOD_PLAIN';
-    return 'LOW';
-  };
-
-  const getProneLabel = (zone) => {
-    if (!zone) return 'Landslide Prone Area';
-    return zone.type === 'flood' ? '🌊 Flood Prone Area' : '⛰️ Landslide Prone Area';
-  };
-
-  const formatSoilMoisture = (val) => {
-    if (val === null || val === undefined) return '42%';
-    if (typeof val === 'number') {
-      return val > 1 ? `${Math.round(val)}%` : `${Math.round(val * 100)}%`;
-    }
-    return val;
-  };
-
-  const getTelemetry = (zone) => {
-    const tel = zone?.telemetry || {};
-    return {
-      temp: tel.temperature !== undefined && tel.temperature !== null ? `${tel.temperature}°C` : '26.5°C',
-      humidity: tel.humidity !== undefined && tel.humidity !== null ? `${tel.humidity}%` : '82%',
-      soil: formatSoilMoisture(tel.soil_moisture),
-      rainfall: tel.rainfall_mm !== undefined && tel.rainfall_mm !== null ? `${tel.rainfall_mm} mm` : '15.0 mm'
-    };
-  };
-
-  const selectedCategory = getRiskCategory(selectedZone);
-  const selectedStyle = CATEGORY_STYLES[selectedCategory] || CATEGORY_STYLES.LOW;
-  const activeTelemetry = getTelemetry(selectedZone);
-
   return (
     <div className={`map-wrapper ${version}`}>
       <MapContainer
@@ -183,7 +93,7 @@ export default function MapView({ version = "default", height }) {
         zoom={MAP_ZOOM}
         scrollWheelZoom={true}
         zoomControl={true}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height:'100%', width: '100%' }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
